@@ -1,0 +1,20 @@
+## Build artifacts
+/bin/
+/obj/
+/TestResults/
+/artifacts/
+
+## User-specific
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## IDE
+.vs/
+.idea/
+.vscode/
+
+## Other
+*.swp
+*.DS_Store

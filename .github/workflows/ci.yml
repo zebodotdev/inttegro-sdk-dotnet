@@ -1,0 +1,37 @@
+name: .NET SDK CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/dotnet
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore src/Commerce/Commerce.csproj && dotnet restore tests/Commerce.Tests/Commerce.Tests.csproj
+
+      - name: Build
+        run: dotnet build src/Commerce/Commerce.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/Commerce.Tests/Commerce.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: sdks/dotnet/**/coverage.cobertura.xml
+          flags: dotnet
+          name: dotnet-sdk
