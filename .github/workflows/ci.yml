@@ -21,7 +21,7 @@ jobs:
         run: dotnet restore src/Commerce/Commerce.csproj && dotnet restore tests/Commerce.Tests/Commerce.Tests.csproj
 
       - name: Build
-        run: dotnet build src/Commerce/Commerce.csproj --configuration Release --no-restore
+        run: dotnet build tests/Commerce.Tests/Commerce.Tests.csproj --configuration Release --no-restore
 
       - name: Test
         run: dotnet test tests/Commerce.Tests/Commerce.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
