@@ -24,7 +24,7 @@ jobs:
         run: dotnet build tests/Commerce.Tests/Commerce.Tests.csproj --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test tests/Commerce.Tests/Commerce.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+        run: dotnet test tests/Commerce.Tests/Commerce.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
