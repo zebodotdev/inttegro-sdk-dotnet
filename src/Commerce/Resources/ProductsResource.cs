@@ -56,11 +56,17 @@ public class ProductsResource
         return _client.PostAsync("/products/update", payload, cancellationToken);
     }
 
+    public Task<CommerceResponse> UpdateAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/products/update", payload, cancellationToken);
+
     public Task<CommerceResponse> PublishAsync(ProductActionRequest payload, CancellationToken cancellationToken = default)
     {
         RequestValidator.Require(payload.ProductId, "product_id");
         return _client.PostAsync("/products/publish", payload, cancellationToken);
     }
+
+    public Task<CommerceResponse> PublishAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/products/publish", payload, cancellationToken);
 
     public Task<CommerceResponse> UnpublishAsync(ProductActionRequest payload, CancellationToken cancellationToken = default)
     {
@@ -68,11 +74,17 @@ public class ProductsResource
         return _client.PostAsync("/products/unpublish", payload, cancellationToken);
     }
 
+    public Task<CommerceResponse> UnpublishAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/products/unpublish", payload, cancellationToken);
+
     public Task<CommerceResponse> ArchiveAsync(ProductActionRequest payload, CancellationToken cancellationToken = default)
     {
         RequestValidator.Require(payload.ProductId, "product_id");
         return _client.PostAsync("/products/archive", payload, cancellationToken);
     }
+
+    public Task<CommerceResponse> ArchiveAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/products/archive", payload, cancellationToken);
 
     public Task<CommerceResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/products/page", payload ?? new { }, cancellationToken);
