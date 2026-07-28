@@ -129,9 +129,9 @@ public class CommerceClientTests
         await client.Otp.LookupAsync(new { transaction_id = "txn_1" });
         await client.Otp.CancelAsync(new { transaction_id = "txn_1", reason = "test" });
 
-        await client.Platform.CreateAppAsync(new { name = "My App" });
-        await client.Platform.GenerateKeyAsync(new { app_id = "app_1" });
-        await client.Platform.NewSessionAsync(new { app_id = "app_1" });
+        await client.Apps.CreateAsync(new { name = "My App" });
+        await client.Apps.LookupAsync();
+        await client.Apps.UpdateAsync(new { alias = "my-app" });
 
         await client.Spec.CountriesAsync();
         await client.Balances.GetAsync();
@@ -201,8 +201,8 @@ public class CommerceClientTests
             "/otp/lookup",
             "/otp/cancel",
             "/apps/create",
-            "/keys/generate",
-            "/sessions/new",
+            "/apps/lookup",
+            "/apps/update",
             "/spec/countries",
             "/balances"
         };
@@ -243,6 +243,28 @@ public class CommerceClientTests
         var root = document.RootElement;
         Assert.False(root.TryGetProperty("idempotency_key", out _));
         var key = root.GetProperty("request_meta").GetProperty("idempotency_key").GetString();
+        Assert.Matches(UuidV7Regex, key!);
+    }
+
+    [Fact]
+    public async Task MessageTemplatesCreateUsesRequestMetaIdempotencyByDefault()
+    {
+        var handler = new RecordingHandler();
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.zebo.dev") };
+        var client = new CommerceClient("test", httpClient: httpClient);
+
+        await client.MessageTemplates.CreateAsync(new
+        {
+            name = "welcome_sms",
+            channel = "sms",
+            purpose = "marketing",
+            sms = new { message_template = "Welcome {{name}}" }
+        });
+
+        var request = Assert.Single(handler.Requests);
+        Assert.False(request.Headers.Contains("Idempotency-Key"));
+        using var document = JsonDocument.Parse(handler.Bodies.Single());
+        var key = document.RootElement.GetProperty("request_meta").GetProperty("idempotency_key").GetString();
         Assert.Matches(UuidV7Regex, key!);
     }
 

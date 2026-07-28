@@ -1,6 +1,6 @@
 # Zebo Commerce .NET SDK
 
-Lightweight .NET client for the Zebo Commerce API (orders, payment methods, payouts, OTP, chimes, balance transactions, financial accounts, platform apps/keys/sessions, and specs). Targets .NET 8 and uses only the base class library.
+Lightweight .NET client for the Zebo Commerce API (orders, payment methods, payouts, OTP, chimes, balance transactions, financial accounts, apps, and specs). Targets .NET 8 and uses only the base class library.
 
 ## Installation
 
@@ -312,12 +312,12 @@ await client.Otp.LookupAsync(new { transaction_id = txn["transaction_id"] });
 await client.Otp.CancelAsync(new { transaction_id = txn["transaction_id"], reason = "user_requested_new_code" });
 ```
 
-### Platform: apps, keys, sessions
+### Apps
 
 ```csharp
-var app = await client.Platform.CreateAppAsync(new { name = "My App" });
-var key = await client.Platform.GenerateKeyAsync(new { app_id = app["app"]?["id"] });
-var session = await client.Platform.NewSessionAsync(new { app_id = app["app"]?["id"] });
+var app = await client.Apps.CreateAsync(new { name = "My App" });
+var currentApp = await client.Apps.LookupAsync();
+var updatedApp = await client.Apps.UpdateAsync(new { alias = "my-app" });
 ```
 
 ## Available resources
@@ -333,7 +333,7 @@ var session = await client.Platform.NewSessionAsync(new { app_id = app["app"]?["
 - `client.Chimes.SendAsync|LookupAsync|ScheduleAsync`
 - `client.Otp.InitiateAsync|VerifyAsync|LookupAsync|CancelAsync`
 - `client.Balances.GetAsync`
-- `client.Platform.CreateAppAsync|GenerateKeyAsync|NewSessionAsync`
+- `client.Apps.CreateAsync|LookupAsync|UpdateAsync`
 - `client.Spec.CountriesAsync`
 
 ## Development

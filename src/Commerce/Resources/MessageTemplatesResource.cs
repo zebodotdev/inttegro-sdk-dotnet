@@ -31,5 +31,7 @@ public sealed class MessageTemplatesResource
         _client.PostAsync("/message_templates/render_preview", payload, cancellationToken);
 
     private static IDictionary<string, string> Headers(string? idempotencyKey) =>
-        new Dictionary<string, string> { ["Idempotency-Key"] = string.IsNullOrWhiteSpace(idempotencyKey) ? Guid.NewGuid().ToString() : idempotencyKey };
+        string.IsNullOrWhiteSpace(idempotencyKey)
+            ? new Dictionary<string, string>()
+            : new Dictionary<string, string> { ["Idempotency-Key"] = idempotencyKey };
 }

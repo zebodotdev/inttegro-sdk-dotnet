@@ -23,7 +23,7 @@ public class CommerceClient : IDisposable
     public BroadcastsResource Broadcasts { get; }
     public MessageTemplatesResource MessageTemplates { get; }
     public OtpResource Otp { get; }
-    public PlatformResource Platform { get; }
+    public AppsResource Apps { get; }
     public SpecResource Spec { get; }
     public BalancesResource Balances { get; }
     public UploadRequestsResource UploadRequests { get; }
@@ -55,7 +55,7 @@ public class CommerceClient : IDisposable
         Broadcasts = new BroadcastsResource(_apiClient);
         MessageTemplates = new MessageTemplatesResource(_apiClient);
         Otp = new OtpResource(_apiClient);
-        Platform = new PlatformResource(_apiClient);
+        Apps = new AppsResource(_apiClient);
         Spec = new SpecResource(_apiClient);
         Balances = new BalancesResource(_apiClient);
         UploadRequests = new UploadRequestsResource(_apiClient);
