@@ -7,7 +7,7 @@ public class BalancesResource
 {
     private readonly ApiClient _client;
 
-    public BalancesResource(ApiClient client) => _client = client;
+    internal BalancesResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> GetAsync(CancellationToken cancellationToken = default) =>
         _client.PostAsync("/balances", new { }, cancellationToken);

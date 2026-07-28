@@ -7,7 +7,7 @@ public sealed class UploadRequestsResource
 {
     private readonly ApiClient _client;
 
-    public UploadRequestsResource(ApiClient client) => _client = client;
+    internal UploadRequestsResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> CreateAsync(object payload, string? idempotencyKey = null, CancellationToken cancellationToken = default) =>
         _client.PostWithHeadersAsync("/upload_requests/create", payload, Headers(idempotencyKey), cancellationToken);

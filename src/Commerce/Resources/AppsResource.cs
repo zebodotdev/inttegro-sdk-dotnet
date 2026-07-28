@@ -7,7 +7,7 @@ public class AppsResource
 {
     private readonly ApiClient _client;
 
-    public AppsResource(ApiClient client) => _client = client;
+    internal AppsResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/apps/create", payload, cancellationToken);

@@ -9,7 +9,7 @@ public class PaymentMethodsResource
 {
     private readonly ApiClient _client;
 
-    public PaymentMethodsResource(ApiClient client) => _client = client;
+    internal PaymentMethodsResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> TokenizeAsync(object payload, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/payment_methods/tokenize", payload, cancellationToken);

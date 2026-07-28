@@ -7,7 +7,7 @@ public class BroadcastsResource
 {
     private readonly ApiClient _client;
 
-    public BroadcastsResource(ApiClient client) => _client = client;
+    internal BroadcastsResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> LookupAsync(string broadcastId, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/broadcasts/lookup", new { broadcast_id = broadcastId }, cancellationToken);

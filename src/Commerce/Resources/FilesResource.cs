@@ -7,7 +7,7 @@ public sealed class FilesResource
 {
     private readonly ApiClient _client;
 
-    public FilesResource(ApiClient client) => _client = client;
+    internal FilesResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
         CreateAsync(payload, idempotencyKey: null, cancellationToken);

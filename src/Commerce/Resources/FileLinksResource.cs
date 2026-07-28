@@ -7,7 +7,7 @@ public sealed class FileLinksResource
 {
     private readonly ApiClient _client;
 
-    public FileLinksResource(ApiClient client) => _client = client;
+    internal FileLinksResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> CreateAsync(object payload, string? idempotencyKey = null, CancellationToken cancellationToken = default) =>
         _client.PostWithHeadersAsync("/file_links/create", payload, Headers(idempotencyKey), cancellationToken);

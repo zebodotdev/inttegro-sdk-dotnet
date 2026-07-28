@@ -7,7 +7,7 @@ public sealed class MessageTemplatesResource
 {
     private readonly ApiClient _client;
 
-    public MessageTemplatesResource(ApiClient client) => _client = client;
+    internal MessageTemplatesResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> CreateAsync(object payload, string? idempotencyKey = null, CancellationToken cancellationToken = default) =>
         _client.PostWithHeadersAsync("/message_templates/create", payload, Headers(idempotencyKey), cancellationToken);

@@ -9,7 +9,7 @@ public class FinancialAccountsResource
 {
     private readonly ApiClient _client;
 
-    public FinancialAccountsResource(ApiClient client) => _client = client;
+    internal FinancialAccountsResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/financial_accounts/create", payload, cancellationToken);

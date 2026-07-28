@@ -9,7 +9,7 @@ public class PricesResource
 {
     private readonly ApiClient _client;
 
-    public PricesResource(ApiClient client) => _client = client;
+    internal PricesResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/prices/create", payload, cancellationToken);

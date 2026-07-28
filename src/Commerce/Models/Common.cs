@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -45,6 +46,33 @@ public sealed class RequestMeta
 {
     [JsonPropertyName("idempotency_key")]
     public string? IdempotencyKey { get; set; }
+}
+
+public sealed class ApiError
+{
+    [JsonPropertyName("message")]
+    public string? Message { get; set; }
+
+    [JsonPropertyName("code")]
+    public string? Code { get; set; }
+
+    [JsonPropertyName("type")]
+    public string? Type { get; set; }
+
+    [JsonPropertyName("url")]
+    public string? Url { get; set; }
+
+    [JsonPropertyName("detail")]
+    public string? Detail { get; set; }
+
+    [JsonPropertyName("fix_code")]
+    public string? FixCode { get; set; }
+
+    [JsonPropertyName("cause")]
+    public string? Cause { get; set; }
+
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? AdditionalData { get; set; }
 }
 
 public sealed class Address

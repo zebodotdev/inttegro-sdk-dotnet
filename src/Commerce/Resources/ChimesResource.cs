@@ -7,7 +7,7 @@ public class ChimesResource
 {
     private readonly ApiClient _client;
 
-    public ChimesResource(ApiClient client) => _client = client;
+    internal ChimesResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> SendAsync(object payload, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/chimes/send", payload, cancellationToken);

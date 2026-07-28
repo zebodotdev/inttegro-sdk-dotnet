@@ -9,7 +9,7 @@ public class PayoutsResource
 {
     private readonly ApiClient _client;
 
-    public PayoutsResource(ApiClient client) => _client = client;
+    internal PayoutsResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> SetDestinationsAsync(object destinations, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/payouts/set_destinations", new { destinations }, cancellationToken);
