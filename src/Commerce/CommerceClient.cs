@@ -35,7 +35,7 @@ public class CommerceClient : IDisposable
         HttpClient? httpClient = null
     )
     {
-        var resolvedBaseUrl = string.IsNullOrWhiteSpace(baseUrl) ? "https://api.zebo.dev" : baseUrl!;
+        var resolvedBaseUrl = string.IsNullOrWhiteSpace(baseUrl) ? "https://api.inttegro.com" : baseUrl!;
         var resolvedTimeout = timeout ?? TimeSpan.FromSeconds(30);
 
         _apiClient = new ApiClient(apiKey, resolvedBaseUrl, resolvedTimeout, httpClient);

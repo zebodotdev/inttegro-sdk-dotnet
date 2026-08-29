@@ -19,7 +19,7 @@ public class CommerceClientTests
     public async Task CallsAllEndpointsWithExpectedPaths()
     {
         var handler = new RecordingHandler();
-        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.zebo.dev") };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
         var client = new CommerceClient("test", httpClient: httpClient);
 
         await client.Orders.CreateAsync(new { number = "1" });
@@ -224,7 +224,7 @@ public class CommerceClientTests
             ResponseBody =
                 "{\"type\":\"authentication_error\",\"code\":\"invalid_api_key\",\"url\":\"https://studio.inttegro.com/e/invalid_api_key\",\"message\":\"invalid key\",\"detail\":\"API key is missing or invalid.\",\"fix_code\":\"check_api_key\",\"cause\":\"authentication_failure\"}"
         };
-        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.zebo.dev") };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
         var client = new CommerceClient("bad", httpClient: httpClient);
 
         await Assert.ThrowsAsync<CommerceAuthenticationException>(() => client.Orders.LookupAsync("or_1"));
@@ -234,7 +234,7 @@ public class CommerceClientTests
     public async Task MutatingPostsGenerateRequestMetaIdempotencyKey()
     {
         var handler = new RecordingHandler();
-        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.zebo.dev") };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
         var client = new CommerceClient("test", httpClient: httpClient);
 
         await client.Orders.CreateAsync(new { number = "ORDER-1", idempotency_key = "legacy" });
@@ -250,7 +250,7 @@ public class CommerceClientTests
     public async Task MessageTemplatesCreateUsesRequestMetaIdempotencyByDefault()
     {
         var handler = new RecordingHandler();
-        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.zebo.dev") };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
         var client = new CommerceClient("test", httpClient: httpClient);
 
         await client.MessageTemplates.CreateAsync(new
