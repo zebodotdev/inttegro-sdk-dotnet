@@ -75,6 +75,21 @@ public sealed class PayoutPageResponse
     public PayoutPage? Page { get; set; }
 }
 
+public sealed class SchedulePayoutRequest
+{
+    [JsonPropertyName("destination_id")]
+    public string? DestinationId { get; set; }
+
+    [JsonPropertyName("execute_after")]
+    public string? ExecuteAfter { get; set; }
+
+    [JsonPropertyName("max_amount")]
+    public long? MaxAmount { get; set; }
+
+    [JsonPropertyName("reference")]
+    public string? Reference { get; set; }
+}
+
 public sealed class CancelPayoutRequest
 {
     [JsonPropertyName("payout_id")]

@@ -26,6 +26,9 @@ public class PayoutsResource
     public Task<CommerceResponse> DisableAutomaticAsync(CancellationToken cancellationToken = default) =>
         _client.PostAsync("/payouts/disable", new { }, cancellationToken);
 
+    public Task<CommerceResponse> EnableAutomaticAsync(CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/payouts/enable", new { }, cancellationToken);
+
     public Task<CommerceResponse> EnableFXAsync(CancellationToken cancellationToken = default) =>
         _client.PostAsync("/payouts/enable_fx", new { }, cancellationToken);
 
@@ -37,6 +40,20 @@ public class PayoutsResource
 
     public Task<CommerceResponse> PageAsync(PayoutPageRequest payload, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/payouts/page", payload, cancellationToken);
+
+    public Task<CommerceResponse> LookupAsync(string payoutId, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/payouts/lookup", new { payout_id = payoutId }, cancellationToken);
+
+    public Task<CommerceResponse> ScheduleAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/payouts/schedule", payload, cancellationToken);
+
+    public Task<CommerceResponse> ScheduleAsync(SchedulePayoutRequest payload, CancellationToken cancellationToken = default)
+    {
+        RequestValidator.Require(payload.DestinationId, "destination_id");
+        RequestValidator.Require(payload.MaxAmount, "max_amount");
+        RequestValidator.Require(payload.Reference, "reference");
+        return _client.PostAsync("/payouts/schedule", payload, cancellationToken);
+    }
 
     public Task<CommerceResponse> CancelAsync(string payoutId, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/payouts/cancel", new { payout_id = payoutId }, cancellationToken);

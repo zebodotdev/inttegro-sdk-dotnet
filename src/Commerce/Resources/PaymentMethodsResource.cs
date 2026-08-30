@@ -53,6 +53,45 @@ public class PaymentMethodsResource
         return _client.PostAsync("/payment_methods/lookup", payload, cancellationToken);
     }
 
+    public Task<CommerceResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/payment_methods/page", payload ?? new { }, cancellationToken);
+
+    public Task<CommerceResponse> PageAsync(PaymentMethodPageRequest payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/payment_methods/page", payload, cancellationToken);
+
+    public Task<CommerceResponse> UpdateAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/payment_methods/update", payload, cancellationToken);
+
+    public Task<CommerceResponse> UpdateAsync(PaymentMethodUpdateRequest payload, CancellationToken cancellationToken = default)
+    {
+        RequestValidator.Require(payload.PaymentMethodId, "payment_method_id");
+        return _client.PostAsync("/payment_methods/update", payload, cancellationToken);
+    }
+
+    public Task<CommerceResponse> ActivateAsync(string paymentMethodId, CancellationToken cancellationToken = default) =>
+        ActivateAsync(ActionRequest("activate", paymentMethodId), cancellationToken);
+
+    public Task<CommerceResponse> ActivateAsync(PaymentMethodActionRequest payload, CancellationToken cancellationToken = default) =>
+        PostActionAsync("/payment_methods/activate", payload, cancellationToken);
+
+    public Task<CommerceResponse> DisactivateAsync(string paymentMethodId, CancellationToken cancellationToken = default) =>
+        DisactivateAsync(ActionRequest("disactivate", paymentMethodId), cancellationToken);
+
+    public Task<CommerceResponse> DisactivateAsync(PaymentMethodActionRequest payload, CancellationToken cancellationToken = default) =>
+        PostActionAsync("/payment_methods/disactivate", payload, cancellationToken);
+
+    public Task<CommerceResponse> ArchiveAsync(string paymentMethodId, CancellationToken cancellationToken = default) =>
+        ArchiveAsync(ActionRequest("archive", paymentMethodId), cancellationToken);
+
+    public Task<CommerceResponse> ArchiveAsync(PaymentMethodActionRequest payload, CancellationToken cancellationToken = default) =>
+        PostActionAsync("/payment_methods/archive", payload, cancellationToken);
+
+    public Task<CommerceResponse> UnarchiveAsync(string paymentMethodId, CancellationToken cancellationToken = default) =>
+        UnarchiveAsync(ActionRequest("unarchive", paymentMethodId), cancellationToken);
+
+    public Task<CommerceResponse> UnarchiveAsync(PaymentMethodActionRequest payload, CancellationToken cancellationToken = default) =>
+        PostActionAsync("/payment_methods/unarchive", payload, cancellationToken);
+
     public Task<CommerceResponse> DeleteAsync(string paymentMethodId, CancellationToken cancellationToken = default) =>
         DeleteAsync(new PaymentMethodDeleteRequest
         {
@@ -71,4 +110,17 @@ public class PaymentMethodsResource
 
     private static RequestMeta StablePaymentMethodRequestMeta(string action, string paymentMethodId) =>
         new() { IdempotencyKey = $"payment_methods_{action}_{paymentMethodId}" };
+
+    private Task<CommerceResponse> PostActionAsync(string path, PaymentMethodActionRequest payload, CancellationToken cancellationToken)
+    {
+        RequestValidator.Require(payload.PaymentMethodId, "payment_method_id");
+        return _client.PostAsync(path, payload, cancellationToken);
+    }
+
+    private static PaymentMethodActionRequest ActionRequest(string action, string paymentMethodId) =>
+        new()
+        {
+            PaymentMethodId = paymentMethodId,
+            RequestMeta = StablePaymentMethodRequestMeta(action, paymentMethodId)
+        };
 }

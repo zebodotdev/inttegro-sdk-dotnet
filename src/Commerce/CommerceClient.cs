@@ -14,6 +14,7 @@ public class CommerceClient : IDisposable
     public BalanceTransactionsResource BalanceTransactions { get; }
     public FinancialAccountsResource FinancialAccounts { get; }
     public FilesResource Files { get; }
+    public FileReferencesResource FileReferences { get; }
     public FileLinksResource FileLinks { get; }
     public CustomersResource Customers { get; }
     public ProductsResource Products { get; }
@@ -24,9 +25,11 @@ public class CommerceClient : IDisposable
     public MessageTemplatesResource MessageTemplates { get; }
     public OtpResource Otp { get; }
     public AppsResource Apps { get; }
+    public KeysResource Keys { get; }
     public SpecResource Spec { get; }
     public BalancesResource Balances { get; }
     public UploadRequestsResource UploadRequests { get; }
+    public PurchaseIntentsResource PurchaseIntents { get; }
 
     public CommerceClient(
         string apiKey,
@@ -46,6 +49,7 @@ public class CommerceClient : IDisposable
         BalanceTransactions = new BalanceTransactionsResource(_apiClient);
         FinancialAccounts = new FinancialAccountsResource(_apiClient);
         Files = new FilesResource(_apiClient);
+        FileReferences = new FileReferencesResource(_apiClient);
         FileLinks = new FileLinksResource(_apiClient);
         Customers = new CustomersResource(_apiClient);
         Products = new ProductsResource(_apiClient);
@@ -56,9 +60,11 @@ public class CommerceClient : IDisposable
         MessageTemplates = new MessageTemplatesResource(_apiClient);
         Otp = new OtpResource(_apiClient);
         Apps = new AppsResource(_apiClient);
+        Keys = new KeysResource(_apiClient);
         Spec = new SpecResource(_apiClient);
         Balances = new BalancesResource(_apiClient);
         UploadRequests = new UploadRequestsResource(_apiClient);
+        PurchaseIntents = new PurchaseIntentsResource(_apiClient);
     }
 
     public void Dispose()

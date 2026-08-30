@@ -35,4 +35,16 @@ public class PricesResource
         RequestValidator.Require(payload.PriceId, "price_id");
         return _client.PostAsync("/prices/update", payload, cancellationToken);
     }
+
+    public Task<CommerceResponse> ActivateAsync(string priceId, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/prices/activate", new { price_id = priceId }, cancellationToken);
+
+    public Task<CommerceResponse> DeactivateAsync(string priceId, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/prices/deactivate", new { price_id = priceId }, cancellationToken);
+
+    public Task<CommerceResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/prices/page", payload ?? new { }, cancellationToken);
+
+    public Task<CommerceResponse> PageAsync(PricePageRequest payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/prices/page", payload, cancellationToken);
 }

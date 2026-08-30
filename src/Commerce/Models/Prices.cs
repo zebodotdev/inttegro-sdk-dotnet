@@ -41,6 +41,18 @@ public sealed class UpdatePriceRequest
     public string? About { get; set; }
 }
 
+public sealed class PricePageRequest
+{
+    [JsonPropertyName("page_number")]
+    public int? PageNumber { get; set; }
+
+    [JsonPropertyName("page_size")]
+    public int? PageSize { get; set; }
+
+    [JsonPropertyName("product_id")]
+    public string? ProductId { get; set; }
+}
+
 public sealed class PriceNominal
 {
     [JsonPropertyName("currency")]

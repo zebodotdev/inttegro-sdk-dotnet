@@ -12,24 +12,31 @@ public class OrdersResource
     internal OrdersResource(ApiClient client) => _client = client;
 
     public Task<CommerceResponse> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/orders/new", payload, cancellationToken);
+        _client.PostAsync("/orders/create", payload, cancellationToken);
 
     public Task<CommerceResponse> CreateAsync(OrderCreateRequest payload, CancellationToken cancellationToken = default)
     {
-        RequestValidator.RequireAny(
-            ("customer_data", payload.CustomerData),
-            ("customer_id", payload.CustomerId),
-            "Either 'customer_data' or 'customer_id' is required."
-        );
-        RequestValidator.RequireCollection(payload.LineItems, "line_items");
-        return _client.PostAsync("/orders/new", payload, cancellationToken);
+        ValidateCreate(payload);
+        return _client.PostAsync("/orders/create", payload, cancellationToken);
     }
 
     public Task<CommerceResponse> NewAsync(object payload, CancellationToken cancellationToken = default) =>
-        CreateAsync(payload, cancellationToken);
+        _client.PostAsync("/orders/new", payload, cancellationToken);
 
-    public Task<CommerceResponse> NewAsync(OrderCreateRequest payload, CancellationToken cancellationToken = default) =>
-        CreateAsync(payload, cancellationToken);
+    public Task<CommerceResponse> NewAsync(OrderCreateRequest payload, CancellationToken cancellationToken = default)
+    {
+        ValidateCreate(payload);
+        return _client.PostAsync("/orders/new", payload, cancellationToken);
+    }
+
+    public Task<CommerceResponse> UpdateAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/orders/update", payload, cancellationToken);
+
+    public Task<CommerceResponse> UpdateAsync(OrderUpdateRequest payload, CancellationToken cancellationToken = default)
+    {
+        RequestValidator.Require(payload.OrderId, "order_id");
+        return _client.PostAsync("/orders/update", payload, cancellationToken);
+    }
 
     public Task<CommerceResponse> LookupAsync(string orderId, object? options = null, CancellationToken cancellationToken = default)
     {
@@ -146,4 +153,14 @@ public class OrdersResource
 
     private static RequestMeta StableOrderRequestMeta(string action, string orderId) =>
         new() { IdempotencyKey = $"orders_{action}_{orderId}" };
+
+    private static void ValidateCreate(OrderCreateRequest payload)
+    {
+        RequestValidator.RequireAny(
+            ("customer_data", payload.CustomerData),
+            ("customer_id", payload.CustomerId),
+            "Either 'customer_data' or 'customer_id' is required."
+        );
+        RequestValidator.RequireCollection(payload.LineItems, "line_items");
+    }
 }

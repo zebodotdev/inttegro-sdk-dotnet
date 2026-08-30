@@ -25,6 +25,7 @@ public class CommerceClientTests
         await client.Orders.CreateAsync(new { number = "1" });
         await client.Orders.NewAsync(new { number = "2" });
         await client.Orders.LookupAsync("or_1");
+        await client.Orders.UpdateAsync(new { order_id = "or_1", number = "ORDER-1" });
         await client.Orders.PayAsync(new { order_id = "or_1" });
         await client.Orders.ConfirmPaymentAsync(new { order_id = "or_1", token = "123456" });
         await client.Orders.RequestConfirmationAsync("or_1");
@@ -52,21 +53,32 @@ public class CommerceClientTests
         await client.PaymentMethods.VerifyAsync("pm_1");
         await client.PaymentMethods.ConfirmVerificationAsync(new { payment_method_id = "pm_1", token = "123456" });
         await client.PaymentMethods.LookupAsync("pm_1");
+        await client.PaymentMethods.PageAsync(new { });
+        await client.PaymentMethods.UpdateAsync(new { payment_method_id = "pm_1", active = true });
+        await client.PaymentMethods.ActivateAsync("pm_1");
+        await client.PaymentMethods.ArchiveAsync("pm_1");
+        await client.PaymentMethods.DisactivateAsync("pm_1");
+        await client.PaymentMethods.UnarchiveAsync("pm_1");
         await client.PaymentMethods.DeleteAsync("pm_1");
         await client.PaymentMethods.SettingsAsync();
 
         await client.Payouts.SetDestinationsAsync(new { ghs = "dest" });
         await client.Payouts.SettingsAsync();
         await client.Payouts.DisableAutomaticAsync();
+        await client.Payouts.EnableAutomaticAsync();
         await client.Payouts.EnableFXAsync();
         await client.Payouts.DisableFXAsync();
         await client.Payouts.PageAsync(new { });
+        await client.Payouts.LookupAsync("po_1");
+        await client.Payouts.ScheduleAsync(new { destination_id = "fa_1", max_amount = 1000, reference = "PAYOUT-1" });
         await client.Payouts.CancelAsync("po_1");
 
+        await client.BalanceTransactions.LookupAsync("txn_1");
         await client.BalanceTransactions.PageAsync(new { });
 
         await client.FinancialAccounts.CreateAsync(new { });
         await client.FinancialAccounts.LookupAsync("fa_1");
+        await client.FinancialAccounts.ReconnectAsync("fa_1");
         await client.FinancialAccounts.ConnectAsync(new { });
         await client.FinancialAccounts.ArchiveAsync(new { account_id = "fa_1" });
         await client.FinancialAccounts.PageAsync(new { });
@@ -108,10 +120,18 @@ public class CommerceClientTests
         await client.Products.ArchiveAsync(new { product_id = "prod_1" });
         await client.Products.PageAsync(new { page_number = 1 });
 
+        await client.Prices.CreateAsync(new { currency = "ghs", amount = 5000 });
+        await client.Prices.LookupAsync("pr_1");
+        await client.Prices.UpdateAsync(new UpdatePriceRequest { PriceId = "pr_1", Label = "Retail" });
+        await client.Prices.ActivateAsync("pr_1");
+        await client.Prices.DeactivateAsync("pr_1");
+        await client.Prices.PageAsync(new { });
+
         await client.Chimes.SendAsync(new { message = "hi" });
         await client.Chimes.LookupAsync("ch_1");
         await client.Chimes.ScheduleAsync(new { recipients = new[] { "+233544998605" }, full_message = "later", send_after = "2026-01-18T10:00:00Z" });
         await client.Chimes.BroadcastAsync(new { recipients = new[] { "+233544998605" }, message_template = "hello", service_name = "marketing" });
+        await client.Chimes.PageAsync(new { });
 
         await client.Schedules.LookupAsync("sch_1");
         await client.Schedules.CancelAsync("sch_1");
@@ -132,15 +152,28 @@ public class CommerceClientTests
         await client.Apps.CreateAsync(new { name = "My App" });
         await client.Apps.LookupAsync();
         await client.Apps.UpdateAsync(new { alias = "my-app" });
+        await client.Keys.GenerateAsync(new { label = "Production" });
+        await client.Keys.LookupAsync("sk_1");
+        await client.Keys.PageAsync(new { });
+        await client.Keys.UpdateAsync(new { secret_key_id = "sk_1", label = "Production checkout" });
+        await client.Keys.DestroyAsync("sk_1");
+        await client.Keys.UsageAsync("sk_1");
+        await client.FileReferences.ReconcileAsync(new { resource_type = "product", resource_id = "prod_1" });
+        await client.PurchaseIntents.CreateAsync(new { product_id = "prod_1", price_id = "pr_1", quantity = new { min = 1, max = 5 } });
+        await client.PurchaseIntents.LookupAsync("sale_1");
+        await client.PurchaseIntents.PageAsync(new { page_number = 1, page_size = 20 });
+        await client.PurchaseIntents.UpdateAsync(new { id = "sale_1", maximum_quantity = 3 });
+        await client.PurchaseIntents.CancelAsync("sale_1");
 
         await client.Spec.CountriesAsync();
         await client.Balances.GetAsync();
 
         var expectedPaths = new[]
         {
-            "/orders/new",
+            "/orders/create",
             "/orders/new",
             "/orders/lookup",
+            "/orders/update",
             "/orders/pay",
             "/orders/confirm_payment",
             "/orders/request_confirmation",
@@ -155,18 +188,29 @@ public class CommerceClientTests
             "/payment_methods/verify",
             "/payment_methods/confirm_verification",
             "/payment_methods/lookup",
+            "/payment_methods/page",
+            "/payment_methods/update",
+            "/payment_methods/activate",
+            "/payment_methods/archive",
+            "/payment_methods/disactivate",
+            "/payment_methods/unarchive",
             "/payment_methods/delete",
             "/payment_methods/settings",
             "/payouts/set_destinations",
             "/payouts/settings",
             "/payouts/disable",
+            "/payouts/enable",
             "/payouts/enable_fx",
             "/payouts/disable_fx",
             "/payouts/page",
+            "/payouts/lookup",
+            "/payouts/schedule",
             "/payouts/cancel",
+            "/balance_transactions/lookup",
             "/balance_transactions/page",
             "/financial_accounts/create",
             "/financial_accounts/lookup",
+            "/financial_accounts/reconnect",
             "/financial_accounts/connect",
             "/financial_accounts/archive",
             "/financial_accounts/page",
@@ -188,10 +232,17 @@ public class CommerceClientTests
             "/products/unpublish",
             "/products/archive",
             "/products/page",
+            "/prices/create",
+            "/prices/lookup",
+            "/prices/update",
+            "/prices/activate",
+            "/prices/deactivate",
+            "/prices/page",
             "/chimes/send",
             "/chimes/lookup",
             "/chimes/schedule",
             "/chimes/broadcast",
+            "/chimes/page",
             "/schedules/lookup",
             "/schedules/cancel",
             "/broadcasts/lookup",
@@ -203,6 +254,18 @@ public class CommerceClientTests
             "/apps/create",
             "/apps/lookup",
             "/apps/update",
+            "/keys/generate",
+            "/keys/lookup",
+            "/keys/page",
+            "/keys/update",
+            "/keys/destroy",
+            "/keys/usage",
+            "/file_references/reconcile",
+            "/purchase_intents/create",
+            "/purchase_intents/lookup",
+            "/purchase_intents/page",
+            "/purchase_intents/update",
+            "/purchase_intents/cancel",
             "/spec/countries",
             "/balances"
         };

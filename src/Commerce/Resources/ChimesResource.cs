@@ -20,4 +20,7 @@ public class ChimesResource
 
     public Task<CommerceResponse> BroadcastAsync(object payload, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/chimes/broadcast", payload, cancellationToken);
+
+    public Task<CommerceResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/chimes/page", payload ?? new { }, cancellationToken);
 }

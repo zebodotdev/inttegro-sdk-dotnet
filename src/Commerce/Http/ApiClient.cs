@@ -204,6 +204,11 @@ internal class ApiClient : IDisposable
             path = uri.AbsolutePath;
         }
 
+        if (path.StartsWith("/keys/", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
         var action = path.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
         return action is not null and not "lookup" and not "page" and not "settings" and not "countries" and not "contents" and not "balances" and not "render_preview";
     }

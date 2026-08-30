@@ -32,6 +32,15 @@ public class FinancialAccountsResource
     public Task<CommerceResponse> LookupAsync(FinancialAccountLookupRequest payload, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/financial_accounts/lookup", payload, cancellationToken);
 
+    public Task<CommerceResponse> ReconnectAsync(string accountId, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/financial_accounts/reconnect", new { account_id = accountId }, cancellationToken);
+
+    public Task<CommerceResponse> ReconnectAsync(FinancialAccountLookupRequest payload, CancellationToken cancellationToken = default)
+    {
+        RequestValidator.Require(payload.AccountId, "account_id");
+        return _client.PostAsync("/financial_accounts/reconnect", payload, cancellationToken);
+    }
+
     public Task<CommerceResponse> ConnectAsync(object payload, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/financial_accounts/connect", payload, cancellationToken);
 

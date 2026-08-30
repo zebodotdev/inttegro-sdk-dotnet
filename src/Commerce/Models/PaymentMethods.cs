@@ -175,6 +175,45 @@ public sealed class PaymentMethodLookupRequest
     public string? PaymentMethodId { get; set; }
 }
 
+public sealed class PaymentMethodPageRequest
+{
+    [JsonPropertyName("customer_id")]
+    public string? CustomerId { get; set; }
+
+    [JsonPropertyName("page_number")]
+    public int? PageNumber { get; set; }
+
+    [JsonPropertyName("page_size")]
+    public int? PageSize { get; set; }
+}
+
+public sealed class PaymentMethodActionRequest
+{
+    [JsonPropertyName("request_meta")]
+    public RequestMeta? RequestMeta { get; set; }
+
+    [JsonPropertyName("payment_method_id")]
+    public string? PaymentMethodId { get; set; }
+}
+
+public sealed class PaymentMethodUpdateRequest
+{
+    [JsonPropertyName("payment_method_id")]
+    public string? PaymentMethodId { get; set; }
+
+    [JsonPropertyName("custom_data")]
+    public Dictionary<string, string?>? CustomData { get; set; }
+
+    [JsonPropertyName("active")]
+    public bool? Active { get; set; }
+
+    [JsonPropertyName("archived")]
+    public bool? Archived { get; set; }
+
+    [JsonPropertyName("owner")]
+    public JsonObject? Owner { get; set; }
+}
+
 public sealed class PaymentMethodDeleteRequest
 {
     [JsonPropertyName("request_meta")]

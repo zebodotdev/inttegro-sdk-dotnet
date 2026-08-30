@@ -126,6 +126,45 @@ public sealed class OrderLookupRequest
     public string? OrderId { get; set; }
 }
 
+public sealed class OrderUpdateRequest
+{
+    [JsonPropertyName("order_id")]
+    public string? OrderId { get; set; }
+
+    [JsonPropertyName("clear_payment_method")]
+    public bool? ClearPaymentMethod { get; set; }
+
+    [JsonPropertyName("custom_data")]
+    public Dictionary<string, string>? CustomData { get; set; }
+
+    [JsonPropertyName("invoice_settings")]
+    public JsonObject? InvoiceSettings { get; set; }
+
+    [JsonPropertyName("finalize")]
+    public bool? Finalize { get; set; }
+
+    [JsonPropertyName("line_items")]
+    public List<LineItem>? LineItems { get; set; }
+
+    [JsonPropertyName("number")]
+    public string? Number { get; set; }
+
+    [JsonPropertyName("receipt_number")]
+    public string? ReceiptNumber { get; set; }
+
+    [JsonPropertyName("payment_method_data")]
+    public PaymentMethodData? PaymentMethodData { get; set; }
+
+    [JsonPropertyName("payment_method_id")]
+    public string? PaymentMethodId { get; set; }
+
+    [JsonPropertyName("statement_descriptor")]
+    public string? StatementDescriptor { get; set; }
+
+    [JsonPropertyName("statement_descriptor_prefix")]
+    public string? StatementDescriptorPrefix { get; set; }
+}
+
 public sealed class OrderPayRequest
 {
     [JsonPropertyName("order_id")]
