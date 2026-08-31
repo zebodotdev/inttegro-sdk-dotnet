@@ -346,3 +346,12 @@ dotnet test tests/Commerce.Tests/Commerce.Tests.csproj
 ```
 
 CI/release/security workflows live in `sdks/dotnet/.github`.
+
+## API enum values
+
+Use `ApiEnums` constants wherever a model accepts a public enum value:
+
+```csharp
+var productType = ApiEnums.ProductType.Digital;
+var refundReason = ApiEnums.RefundReason.RequestedByCustomer;
+```
