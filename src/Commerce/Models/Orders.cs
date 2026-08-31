@@ -375,34 +375,10 @@ public sealed class OrderPayment
     public string? PaidAt { get; set; }
 
     [JsonPropertyName("balance_transaction")]
-    public OrderBalanceTransaction? BalanceTransaction { get; set; }
+    public BalanceTransaction? BalanceTransaction { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonNode?>? Extra { get; set; }
-}
-
-public sealed class OrderBalanceTransaction
-{
-    [JsonPropertyName("id")]
-    public string? Id { get; set; }
-
-    [JsonPropertyName("payout_id")]
-    public string? PayoutId { get; set; }
-
-    [JsonPropertyName("payment_id")]
-    public string? PaymentId { get; set; }
-
-    [JsonPropertyName("created_at")]
-    public string? CreatedAt { get; set; }
-
-    [JsonPropertyName("paid_at")]
-    public string? PaidAt { get; set; }
-
-    [JsonPropertyName("amount")]
-    public Money? Amount { get; set; }
-
-    [JsonPropertyName("payout_configuration")]
-    public OrderPayoutConfiguration? PayoutConfiguration { get; set; }
 }
 
 public sealed class OrderInvoiceFormat

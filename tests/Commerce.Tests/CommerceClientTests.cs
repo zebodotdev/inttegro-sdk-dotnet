@@ -16,6 +16,33 @@ public class CommerceClientTests
     private static readonly Regex UuidV7Regex = new("^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", RegexOptions.IgnoreCase);
 
     [Fact]
+    public void BalanceTransactionsDeserializeSemanticSourcesAndOrderEmbedding()
+    {
+        const string paymentJson = """
+            {"id":"bt_payment","type":"payment","payment_id":"py_123","order_id":"or_123","amount":{"currency":"GHS","value":2500},"created_at":"2026-08-31T12:00:00Z"}
+            """;
+        var payment = JsonSerializer.Deserialize<BalanceTransaction>(paymentJson)!;
+        Assert.Equal(BalanceTransactionType.Payment, payment.Type);
+        Assert.Equal("py_123", payment.SourceId);
+        Assert.Null(payment.RefundId);
+        Assert.Equal(2500L, payment.Amount.Value);
+
+        const string refundJson = """
+            {"id":"bt_refund","type":"refund","refund_id":"rf_123","order_id":"or_123","amount":{"currency":"GHS","value":500},"created_at":"2026-08-31T12:01:00Z"}
+            """;
+        var refund = JsonSerializer.Deserialize<BalanceTransaction>(refundJson)!;
+        Assert.Equal(BalanceTransactionType.Refund, refund.Type);
+        Assert.Equal("rf_123", refund.SourceId);
+        Assert.Null(refund.PaymentId);
+
+        const string orderJson = """
+            {"id":"or_123","payment":{"id":"py_123","balance_transaction":{"id":"bt_payment","type":"payment","payment_id":"py_123","order_id":"or_123","amount":{"currency":"GHS","value":2500},"created_at":"2026-08-31T12:00:00Z"}}}
+            """;
+        var order = JsonSerializer.Deserialize<Order>(orderJson)!;
+        Assert.Equal(BalanceTransactionType.Payment, order.Payment!.BalanceTransaction!.Type);
+    }
+
+    [Fact]
     public async Task CallsAllEndpointsWithExpectedPaths()
     {
         var handler = new RecordingHandler();
