@@ -1,31 +1,115 @@
-name: .NET SDK Release
+name: Release
 
 on:
   push:
     tags:
-      - "dotnet-sdk-v*"
-      - "inttegro-dotnet-v*"
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  pack:
+  release:
+    if: github.repository == 'zebodotdev/inttegro-sdk-dotnet'
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    timeout-minutes: 30
+    environment: release
+    permissions:
+      attestations: write
+      contents: write
+      id-token: write
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+    steps:
+      - name: Check out the release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: "8.0.x"
 
-      - name: Restore
-        run: dotnet restore src/Inttegro/Inttegro.csproj
+      - name: Verify the release tag and package version
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_version="$(dotnet msbuild src/Inttegro/Inttegro.csproj -nologo -getProperty:Version | tail -n 1 | tr -d '\r')"
+          test "${GITHUB_REF_NAME}" = "v${package_version}"
+          test "$(git rev-list -n 1 "${GITHUB_REF_NAME}")" = "${GITHUB_SHA}"
 
-      - name: Pack
-        run: dotnet pack src/Inttegro/Inttegro.csproj -c Release -o ./artifacts
+      - name: Restore and test
+        run: |
+          dotnet restore tests/Inttegro.Tests/Inttegro.Tests.csproj
+          dotnet test tests/Inttegro.Tests/Inttegro.Tests.csproj --configuration Release --no-restore
 
-      - name: Upload package
-        uses: actions/upload-artifact@v4
+      - name: Pack the exact release artifacts
+        run: >-
+          dotnet pack src/Inttegro/Inttegro.csproj
+          --configuration Release
+          --output artifacts
+          --no-restore
+          -p:RepositoryCommit="${GITHUB_SHA}"
+
+      - name: Inspect the packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find artifacts -maxdepth 1 -name '*.nupkg' | wc -l | tr -d ' ')" = "1"
+          test "$(find artifacts -maxdepth 1 -name '*.snupkg' | wc -l | tr -d ' ')" = "1"
+          unzip -l artifacts/*.nupkg > artifacts/PACKAGE-CONTENTS.txt
+          grep -q 'README.md' artifacts/PACKAGE-CONTENTS.txt
+
+      - name: Attest the NuGet packages
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
-          name: inttegro-dotnet-sdk
-          path: artifacts/*.nupkg
+          subject-path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+
+      - name: Record release provenance and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "${{ steps.attest.outputs.bundle-path }}" artifacts/ATTESTATION.sigstore.jsonl
+          {
+            echo "repository=https://github.com/${GITHUB_REPOSITORY}"
+            echo "tag=${GITHUB_REF_NAME}"
+            echo "commit=${GITHUB_SHA}"
+            echo "workflow=${GITHUB_WORKFLOW_REF}"
+          } > artifacts/PROVENANCE.txt
+          (
+            cd artifacts
+            sha256sum ./*.nupkg ./*.snupkg ./ATTESTATION.sigstore.jsonl ./PACKAGE-CONTENTS.txt ./PROVENANCE.txt > SHA256SUMS
+          )
+
+      - name: Create the draft GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}" artifacts/*
+          --draft
+          --generate-notes
+          --title "Inttegro .NET SDK ${GITHUB_REF_NAME}"
+          --verify-tag
+
+      - name: Exchange GitHub OIDC for a short-lived NuGet key
+        id: nuget-login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Publish the exact package to NuGet.org
+        shell: bash
+        run: >-
+          dotnet nuget push artifacts/*.nupkg
+          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+
+      - name: Finalize the immutable GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "${GITHUB_REF_NAME}" --draft=false

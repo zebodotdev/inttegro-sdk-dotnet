@@ -97,6 +97,16 @@ The SDK covers orders and checkout, customers, products and prices, purchase int
 
 See the [API reference](https://studio.inttegro.com/api-reference) for request fields and lifecycle rules, [errors](https://studio.inttegro.com/errors) for recovery guidance, and [idempotency](https://studio.inttegro.com/idempotency) for safe retries.
 
+## Verify a release
+
+The GitHub release for each version is the canonical record. It contains the exact NuGet and symbol packages uploaded to NuGet.org, SHA-256 checksums, and a Sigstore attestation tied to the source commit and release workflow. Source Link connects packaged binaries to this repository.
+
+```bash
+sha256sum --check SHA256SUMS
+gh attestation verify Inttegro.1.0.0.nupkg \
+  --repo zebodotdev/inttegro-sdk-dotnet
+```
+
 ## Develop
 
 ```bash
