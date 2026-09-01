@@ -4,14 +4,11 @@ on:
   push:
     tags:
       - "dotnet-sdk-v*"
-      - "commerce-dotnet-v*"
+      - "inttegro-dotnet-v*"
 
 jobs:
   pack:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: sdks/dotnet
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,13 +19,13 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore
-        run: dotnet restore src/Commerce/Commerce.csproj
+        run: dotnet restore src/Inttegro/Inttegro.csproj
 
       - name: Pack
-        run: dotnet pack src/Commerce/Commerce.csproj -c Release -o ./artifacts
+        run: dotnet pack src/Inttegro/Inttegro.csproj -c Release -o ./artifacts
 
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
-          name: commerce-dotnet-sdk
-          path: sdks/dotnet/artifacts/*.nupkg
+          name: inttegro-dotnet-sdk
+          path: artifacts/*.nupkg

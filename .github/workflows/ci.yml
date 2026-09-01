@@ -18,13 +18,13 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore
-        run: dotnet restore src/Commerce/Commerce.csproj && dotnet restore tests/Commerce.Tests/Commerce.Tests.csproj
+        run: dotnet restore src/Inttegro/Inttegro.csproj && dotnet restore tests/Inttegro.Tests/Inttegro.Tests.csproj
 
       - name: Build
-        run: dotnet build tests/Commerce.Tests/Commerce.Tests.csproj --configuration Release --no-restore
+        run: dotnet build tests/Inttegro.Tests/Inttegro.Tests.csproj --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test tests/Commerce.Tests/Commerce.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
+        run: dotnet test tests/Inttegro.Tests/Inttegro.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
