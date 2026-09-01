@@ -189,7 +189,7 @@ public class InttegroClientTests
         await client.PurchaseIntents.CreateAsync(new { product_id = "prod_1", price_id = "pr_1", quantity = new { min = 1, max = 5 } });
         await client.PurchaseIntents.LookupAsync("sale_1");
         await client.PurchaseIntents.PageAsync(new { page_number = 1, page_size = 20 });
-        await client.PurchaseIntents.UpdateAsync(new { id = "sale_1", maximum_quantity = 3 });
+        await client.PurchaseIntents.UpdateAsync(new { id = "sale_1", quantity = new { min = 1, max = 3 } });
         await client.PurchaseIntents.CancelAsync("sale_1");
 
         await client.Spec.CountriesAsync();
