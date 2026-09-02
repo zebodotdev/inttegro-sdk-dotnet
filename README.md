@@ -1,5 +1,7 @@
 # Inttegro .NET SDK
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/zebodotdev/inttegro-sdk-dotnet/badge)](https://scorecard.dev/viewer/?uri=github.com/zebodotdev/inttegro-sdk-dotnet)
+
 The official .NET client for building server-side Inttegro integrations.
 
 > **Fastest, most modern path:** connect an agent to [Inttegro MCP](https://studio.inttegro.com/inttegro-mcp) at `https://mcp.inttegro.com`, then ask it to run `design_integration`. It will produce an implementation and test plan for your application. Use this SDK when you are ready to connect that plan to your .NET service.
