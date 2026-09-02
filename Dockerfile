@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:bb32ba3ba3ea36e38572d9d8db76fa15f7cbf722f3f886e06bca6d528bd4fba8 AS base
 WORKDIR /app
 COPY src/Inttegro/Inttegro.csproj src/Inttegro/
 COPY tests/Inttegro.Tests/Inttegro.Tests.csproj tests/Inttegro.Tests/
