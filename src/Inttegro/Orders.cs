@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace Inttegro.Models;
+namespace Inttegro;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum PaymentMethodType
@@ -448,18 +448,6 @@ public sealed class Order
     public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
-public sealed class OrderCreateResponse
-{
-    [JsonPropertyName("order")]
-    public Order? Order { get; set; }
-}
-
-public sealed class OrderResponse
-{
-    [JsonPropertyName("order")]
-    public Order? Order { get; set; }
-}
-
 public sealed class OrderPage
 {
     [JsonPropertyName("number")]
@@ -472,8 +460,44 @@ public sealed class OrderPage
     public List<Order>? Orders { get; set; }
 }
 
-public sealed class OrderPageResponse
+public sealed class OrderDocumentDeliveryResult
 {
-    [JsonPropertyName("page")]
-    public OrderPage? Page { get; set; }
+    [JsonPropertyName("order")]
+    public Order? Order { get; set; }
+
+    [JsonPropertyName("delivery")]
+    public OrderDocumentDelivery? Delivery { get; set; }
+}
+
+public sealed class OrderDocumentDelivery
+{
+    [JsonPropertyName("document_kind")]
+    public string? DocumentKind { get; set; }
+
+    [JsonPropertyName("document_url")]
+    public string? DocumentUrl { get; set; }
+
+    [JsonPropertyName("sent_channels")]
+    public List<string>? SentChannels { get; set; }
+
+    [JsonPropertyName("failed_channels")]
+    public List<string>? FailedChannels { get; set; }
+
+    [JsonPropertyName("deliveries")]
+    public List<OrderDocumentDeliveryAttempt>? Deliveries { get; set; }
+
+    [JsonPropertyName("failures")]
+    public List<OrderDocumentDeliveryAttempt>? Failures { get; set; }
+}
+
+public sealed class OrderDocumentDeliveryAttempt
+{
+    [JsonPropertyName("channel")]
+    public string? Channel { get; set; }
+
+    [JsonPropertyName("chime_id")]
+    public string? ChimeId { get; set; }
+
+    [JsonPropertyName("error")]
+    public string? Error { get; set; }
 }

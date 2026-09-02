@@ -1,4 +1,4 @@
-using Inttegro.Models;
+using Inttegro;
 using Xunit;
 
 namespace Inttegro.Tests;

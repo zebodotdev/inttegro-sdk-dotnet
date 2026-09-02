@@ -1,7 +1,7 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace Inttegro.Models;
+namespace Inttegro;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum BalanceTransactionType

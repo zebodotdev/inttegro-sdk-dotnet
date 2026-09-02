@@ -1,4 +1,4 @@
-namespace Inttegro.Models;
+namespace Inttegro;
 
 /// <summary>String constants for every enum published by the Inttegro API.</summary>
 public static class ApiEnums

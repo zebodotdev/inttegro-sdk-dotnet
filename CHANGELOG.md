@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Breaking: moved public request, response, enum, and domain types from `Inttegro.Models` to `Inttegro`.
+
 ## [1.0.0] - 2026-09-01
 
 - Breaking: renamed the package, namespaces, client, response, and exception types to `Inttegro`.

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Inttegro.Models;
+namespace Inttegro;
 
 public sealed class CreatePriceRequest
 {

@@ -76,6 +76,26 @@ internal class ApiClient : IDisposable
         return new InttegroResponse(parsed);
     }
 
+    public async Task<T> PostAsync<T>(string path, object? payload = null, CancellationToken cancellationToken = default)
+        where T : class
+    {
+        var response = await PostAsync(path, payload, cancellationToken);
+        return response.Deserialize<T>()
+            ?? throw new InvalidOperationException($"Inttegro returned an invalid response for {path}");
+    }
+
+    public async Task<T> PostResourceAsync<T>(
+        string path,
+        string field,
+        object? payload = null,
+        CancellationToken cancellationToken = default
+    ) where T : class
+    {
+        var response = await PostAsync(path, payload, cancellationToken);
+        return response[field]?.Deserialize<T>()
+            ?? throw new InvalidOperationException($"Inttegro returned an invalid {field} response for {path}");
+    }
+
     public async Task<InttegroResponse> PostWithHeadersAsync(
         string path,
         object? payload = null,
@@ -95,6 +115,19 @@ internal class ApiClient : IDisposable
             request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
         return await SendForJsonAsync(request, cancellationToken);
+    }
+
+    public async Task<T> PostResourceWithHeadersAsync<T>(
+        string path,
+        string field,
+        object? payload = null,
+        IDictionary<string, string>? headers = null,
+        CancellationToken cancellationToken = default
+    ) where T : class
+    {
+        var response = await PostWithHeadersAsync(path, payload, headers, cancellationToken);
+        return response[field]?.Deserialize<T>()
+            ?? throw new InvalidOperationException($"Inttegro returned an invalid {field} response for {path}");
     }
 
     public async Task<InttegroResponse> PostMultipartAsync(

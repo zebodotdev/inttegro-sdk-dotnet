@@ -6,7 +6,6 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Inttegro;
 using Inttegro.Errors;
-using Inttegro.Models;
 using System.Linq;
 using Xunit;
 
@@ -324,10 +323,10 @@ public class InttegroClientTests
 
         Assert.Equal(expectedPaths, handler.Requests.Select(r => r.RequestUri!.AbsolutePath).ToArray());
 
-        // Response wrapping
+        // Order envelopes are lowered to the domain model.
         handler.ResponseBody = JsonSerializer.Serialize(new { order = new { id = "or_123" } });
         var resp = await client.Orders.CreateAsync(new { number = "3" });
-        Assert.Equal("or_123", resp["order"]?["id"]?.GetValue<string>());
+        Assert.Equal("or_123", resp.Id);
     }
 
     [Fact]
@@ -364,7 +363,7 @@ public class InttegroClientTests
         var alias = await client.Orders.RefundAsync(payload);
 
         Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", canonical["refund"]?["id"]?.GetValue<string>());
-        Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", alias["refund"]?["id"]?.GetValue<string>());
+        Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", alias.Id);
         Assert.Equal(RefundStatus.Pending, canonical.Deserialize<RefundResponse>()?.Refund?.Status);
         Assert.Equal(RefundReason.ItemReturned, canonical.Deserialize<RefundResponse>()?.Refund?.Reason);
         Assert.Equal(new[] { "/refunds/create", "/orders/refund" }, handler.Requests.Select(r => r.RequestUri!.AbsolutePath));
@@ -433,15 +432,22 @@ public class InttegroClientTests
         public List<HttpRequestMessage> Requests { get; } = new();
         public List<string> Bodies { get; } = new();
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
-        public string ResponseBody { get; set; } = "{\"ok\":true}";
+        public string? ResponseBody { get; set; }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Requests.Add(request);
             Bodies.Add(request.Content == null ? "" : await request.Content.ReadAsStringAsync(cancellationToken));
+            var responseBody = ResponseBody ?? (request.RequestUri!.AbsolutePath switch
+            {
+                "/orders/refund" => "{\"refund\":{\"id\":\"rf_123\"}}",
+                "/orders/page" => "{\"page\":{\"number\":0,\"size\":0,\"orders\":[]}}",
+                var path when path.StartsWith("/orders/", StringComparison.Ordinal) => "{\"order\":{\"id\":\"or_123\"}}",
+                _ => "{\"ok\":true}"
+            });
             var response = new HttpResponseMessage(StatusCode)
             {
-                Content = new StringContent(ResponseBody, Encoding.UTF8, "application/json")
+                Content = new StringContent(responseBody, Encoding.UTF8, "application/json")
             };
             response.Headers.Date = DateTimeOffset.UtcNow;
             return response;

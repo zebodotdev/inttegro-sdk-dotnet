@@ -1,5 +1,5 @@
 using Inttegro.Http;
-using Inttegro.Models;
+using Inttegro;
 using Inttegro.Responses;
 using Inttegro.Validation;
 

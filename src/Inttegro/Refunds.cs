@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Inttegro.Models;
+namespace Inttegro;
 
 [JsonConverter(typeof(RefundReasonJsonConverter))]
 public enum RefundReason

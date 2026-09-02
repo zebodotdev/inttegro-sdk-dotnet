@@ -31,7 +31,6 @@ Create and finalize an order, then send the customer to its hosted invoice URL:
 ```csharp
 using Inttegro;
 using Inttegro.Errors;
-using Inttegro.Models;
 
 var apiKey = Environment.GetEnvironmentVariable("INTTEGRO_API_KEY")
     ?? throw new InvalidOperationException("INTTEGRO_API_KEY is required");
@@ -40,7 +39,7 @@ using var inttegro = new InttegroClient(apiKey);
 
 try
 {
-    var response = await inttegro.Orders.CreateAsync(new OrderCreateRequest
+    var order = await inttegro.Orders.CreateAsync(new OrderCreateRequest
     {
         RequestMeta = new RequestMeta { IdempotencyKey = "checkout-cart-123" },
         CustomerData = new CustomerData
@@ -71,10 +70,9 @@ try
         }
     });
 
-    var created = response.Deserialize<OrderCreateResponse>();
-    var checkoutUrl = created?.Order?.Invoice?.Format?.Web?.Url
+    var checkoutUrl = order.Invoice?.Format?.Web?.Url
         ?? throw new InvalidOperationException("Order did not include a checkout URL");
-    Console.WriteLine($"{created.Order!.Id} {checkoutUrl}");
+    Console.WriteLine($"{order.Id} {checkoutUrl}");
 }
 catch (InttegroApiException error)
 {
@@ -108,7 +106,7 @@ var refund = response.Deserialize<RefundResponse>()?.Refund;
 Console.WriteLine($"{refund?.Id} {refund?.Status} {refund?.Total?.Value}");
 ```
 
-Use `Refunds.CancelAsync`, `Refunds.LookupAsync`, and `Refunds.PageAsync` to manage the refund lifecycle. `Orders.RefundAsync` remains a compatibility alias with the same request and response contract.
+Use `Refunds.CancelAsync`, `Refunds.LookupAsync`, and `Refunds.PageAsync` to manage the refund lifecycle. `Orders.RefundAsync` remains a compatibility alias and returns the created `Refund` directly.
 
 ## Work with the API
 
