@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 
 namespace Inttegro;
 
@@ -33,6 +34,39 @@ public sealed class LookupCustomerRequest
 {
     [JsonPropertyName("customer_id")]
     public string? CustomerId { get; set; }
+}
+
+public sealed class UpdateCustomerRequest
+{
+    [JsonPropertyName("billing_address")]
+    public Address? BillingAddress { get; set; }
+
+    [JsonPropertyName("custom_data")]
+    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+
+    [JsonPropertyName("customer_id")]
+    public string? CustomerId { get; set; }
+
+    [JsonPropertyName("email_address")]
+    public string? EmailAddress { get; set; }
+
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("phone_number")]
+    public string? PhoneNumber { get; set; }
+
+    [JsonPropertyName("reference")]
+    public string? Reference { get; set; }
+
+    [JsonPropertyName("shipping_address")]
+    public Address? ShippingAddress { get; set; }
+
+    [JsonPropertyName("suffix")]
+    public string? Suffix { get; set; }
+
+    [JsonPropertyName("title")]
+    public string? Title { get; set; }
 }
 
 public sealed class PageCustomersRequest

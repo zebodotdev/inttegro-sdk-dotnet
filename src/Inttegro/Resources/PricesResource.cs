@@ -42,6 +42,9 @@ public class PricesResource
     public Task<InttegroResponse> DeactivateAsync(string priceId, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/prices/deactivate", new { price_id = priceId }, cancellationToken);
 
+    public Task<InttegroResponse> ArchiveAsync(string priceId, CancellationToken cancellationToken = default) =>
+        _client.PostAsync("/prices/archive", new { price_id = priceId }, cancellationToken);
+
     public Task<InttegroResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/prices/page", payload ?? new { }, cancellationToken);
 

@@ -29,6 +29,12 @@ public class CustomersResource
         return _client.PostAsync("/customers/lookup", payload, cancellationToken);
     }
 
+    public Task<InttegroResponse> UpdateAsync(UpdateCustomerRequest payload, CancellationToken cancellationToken = default)
+    {
+        RequestValidator.Require(payload.CustomerId, "customer_id");
+        return _client.PostAsync("/customers/update", payload, cancellationToken);
+    }
+
     public Task<InttegroResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
         _client.PostAsync("/customers/page", payload ?? new { }, cancellationToken);
 

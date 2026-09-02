@@ -128,7 +128,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify Inttegro.1.0.0.nupkg \
+gh attestation verify Inttegro.2.0.0.nupkg \
   --repo zebodotdev/inttegro-sdk-dotnet
 ```
 
