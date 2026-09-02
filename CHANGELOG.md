@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-02
+
 - Breaking: moved public request, response, enum, and domain types from `Inttegro.Models` to `Inttegro`.
 
 ## [1.0.0] - 2026-09-01
