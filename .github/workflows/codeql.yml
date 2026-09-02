@@ -1,5 +1,7 @@
 name: .NET SDK Code Scanning
 
+permissions: read-all
+
 on:
   push:
     branches: [main, master]
