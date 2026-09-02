@@ -282,7 +282,7 @@ public sealed class OrderCustomer
     public string? CreatedAt { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class OrderLineItemGroup
@@ -294,7 +294,7 @@ public sealed class OrderLineItemGroup
     public Money? Total { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class OrderPaymentAttempt
@@ -336,7 +336,7 @@ public sealed class OrderPaymentNextAction
     public JsonObject? Redirect { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class OrderPayment
@@ -378,7 +378,7 @@ public sealed class OrderPayment
     public BalanceTransaction? BalanceTransaction { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class OrderInvoiceFormat
@@ -408,7 +408,7 @@ public sealed class OrderInvoice
     public List<JsonObject>? Deliveries { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class Order
@@ -447,7 +447,7 @@ public sealed class Order
     public string? CompletedAt { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class OrderCreateResponse

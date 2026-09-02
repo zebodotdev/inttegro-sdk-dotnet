@@ -278,7 +278,7 @@ public sealed class FinancialAccountArchiveRequest
     public string? AccountId { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class FinancialAccountPageRequest
@@ -317,5 +317,5 @@ public sealed class FinancialAccountVerifyRequest
     public string? Token { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }

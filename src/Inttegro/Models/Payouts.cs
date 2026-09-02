@@ -168,5 +168,5 @@ public sealed class PayoutSummary
     public List<string>? BalanceTransactionIds { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }

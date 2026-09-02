@@ -262,7 +262,7 @@ public sealed class PaymentMethodObject
     public string? VerifiedAt { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, JsonNode?>? Extra { get; set; }
+    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class PaymentMethodResponse
