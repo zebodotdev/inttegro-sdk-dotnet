@@ -85,6 +85,31 @@ catch (InttegroApiException error)
 
 Amounts use integer minor units: `5000` GHS is GHS 50.00. Reuse the same idempotency key when retrying the same logical write. If you omit one, the SDK generates a UUIDv7 key for mutating calls.
 
+## Create a partial refund
+
+Refunds target paid order line items and return money to the original payment method:
+
+```csharp
+var response = await inttegro.Refunds.CreateAsync(new CreateRefundRequest
+{
+    OrderId = "or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
+    Reason = RefundReason.ItemReturned,
+    LineItems =
+    [
+        new CreateRefundLineItem
+        {
+            OrderLineItemId = "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
+            RefundAmount = new Money { Currency = "ghs", Value = 2500 }
+        }
+    ]
+});
+
+var refund = response.Deserialize<RefundResponse>()?.Refund;
+Console.WriteLine($"{refund?.Id} {refund?.Status} {refund?.Total?.Value}");
+```
+
+Use `Refunds.CancelAsync`, `Refunds.LookupAsync`, and `Refunds.PageAsync` to manage the refund lifecycle. `Orders.RefundAsync` remains a compatibility alias with the same request and response contract.
+
 ## Work with the API
 
 The SDK covers orders and checkout, customers, products and prices, purchase intents, payment methods, balances, payouts and refunds, notifications, files, application settings, keys, and country specifications. Resources use .NET properties such as `PurchaseIntents` and `PaymentMethods`.

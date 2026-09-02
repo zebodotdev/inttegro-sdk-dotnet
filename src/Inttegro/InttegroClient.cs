@@ -9,6 +9,7 @@ public class InttegroClient : IDisposable
     private bool _disposed;
 
     public OrdersResource Orders { get; }
+    public RefundsResource Refunds { get; }
     public PaymentMethodsResource PaymentMethods { get; }
     public PayoutsResource Payouts { get; }
     public BalanceTransactionsResource BalanceTransactions { get; }
@@ -44,6 +45,7 @@ public class InttegroClient : IDisposable
         _apiClient = new ApiClient(apiKey, resolvedBaseUrl, resolvedTimeout, httpClient);
 
         Orders = new OrdersResource(_apiClient);
+        Refunds = new RefundsResource(_apiClient);
         PaymentMethods = new PaymentMethodsResource(_apiClient);
         Payouts = new PayoutsResource(_apiClient);
         BalanceTransactions = new BalanceTransactionsResource(_apiClient);

@@ -136,13 +136,27 @@ public class OrdersResource
         return _client.PostAsync("/orders/cancel", payload, cancellationToken);
     }
 
-    public Task<InttegroResponse> RefundAsync(string orderId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/orders/refund", new { order_id = orderId }, cancellationToken);
+    /// <summary>
+    /// Creates a refund through the compatibility route. New integrations should use Refunds.CreateAsync.
+    /// </summary>
+    [Obsolete("Use Refunds.CreateAsync for new integrations.")]
+    public Task<InttegroResponse> RefundAsync(CreateRefundRequest payload, CancellationToken cancellationToken = default)
+        => RefundAsync(payload, idempotencyKey: null, cancellationToken);
 
-    public Task<InttegroResponse> RefundAsync(OrderRefundRequest payload, CancellationToken cancellationToken = default)
+    [Obsolete("Use Refunds.CreateAsync for new integrations.")]
+    public Task<InttegroResponse> RefundAsync(
+        CreateRefundRequest payload,
+        string? idempotencyKey,
+        CancellationToken cancellationToken = default
+    )
     {
-        RequestValidator.Require(payload.OrderId, "order_id");
-        return _client.PostAsync("/orders/refund", payload, cancellationToken);
+        RefundsResource.ValidateCreate(payload);
+        return _client.PostWithHeadersAsync(
+            "/orders/refund",
+            payload,
+            RefundsResource.IdempotencyHeaders(idempotencyKey),
+            cancellationToken
+        );
     }
 
     public Task<InttegroResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>

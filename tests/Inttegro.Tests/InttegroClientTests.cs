@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Inttegro;
 using Inttegro.Errors;
@@ -61,8 +62,28 @@ public class InttegroClientTests
         await client.Orders.SendReceiptAsync(new OrderSendReceiptParams { OrderId = "or_1" });
         await client.Orders.CompleteAsync(new { order_id = "or_1" });
         await client.Orders.CancelAsync("or_1");
-        await client.Orders.RefundAsync("or_1");
+        var refundRequest = new CreateRefundRequest
+        {
+            OrderId = "or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
+            Reason = RefundReason.ItemReturned,
+            LineItems =
+            [
+                new CreateRefundLineItem
+                {
+                    OrderLineItemId = "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
+                    RefundAmount = new Money { Currency = "ghs", Value = 2500 },
+                    Reason = RefundReason.ItemNotAsDescribed
+                }
+            ],
+            RequestMeta = new RequestMeta { IdempotencyKey = "refund_order_alias_001" }
+        };
+        await client.Orders.RefundAsync(refundRequest);
         await client.Orders.PageAsync(new { });
+
+        await client.Refunds.CreateAsync(refundRequest);
+        await client.Refunds.CancelAsync(new CancelRefundRequest { RefundId = "rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd" });
+        await client.Refunds.LookupAsync("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd");
+        await client.Refunds.PageAsync(new PageRefundsRequest { PageNumber = 1 });
 
         await client.PaymentMethods.TokenizeAsync(new
         {
@@ -211,6 +232,10 @@ public class InttegroClientTests
             "/orders/cancel",
             "/orders/refund",
             "/orders/page",
+            "/refunds/create",
+            "/refunds/cancel",
+            "/refunds/lookup",
+            "/refunds/page",
             "/payment_methods/tokenize",
             "/payment_methods/verify",
             "/payment_methods/confirm_verification",
@@ -303,6 +328,51 @@ public class InttegroClientTests
         handler.ResponseBody = JsonSerializer.Serialize(new { order = new { id = "or_123" } });
         var resp = await client.Orders.CreateAsync(new { number = "3" });
         Assert.Equal("or_123", resp["order"]?["id"]?.GetValue<string>());
+    }
+
+    [Fact]
+    public async Task RefundCreateAndOrderAliasShareTheSameContract()
+    {
+        var handler = new RecordingHandler
+        {
+            ResponseBody = """
+                {"refund":{"id":"rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd","order_id":"or_0123456789abcdefghijklmnopqrstuvwxyzABCD","status":"pending","total":{"currency":"ghs","value":2500},"line_items":[{"id":"rli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN","order_line_item_id":"oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN","original_amount_paid":{"currency":"ghs","value":5000},"refund_amount":{"currency":"ghs","value":2500}}],"reason":"item_returned","created_at":"2026-09-02T10:00:00Z"}}
+                """
+        };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
+        var client = new InttegroClient("test", httpClient: httpClient);
+        var payload = new CreateRefundRequest
+        {
+            OrderId = "or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
+            Reason = RefundReason.ItemReturned,
+            ReasonDetails = "Returned unopened",
+            Reference = "RETURN-2026-0001",
+            LineItems =
+            [
+                new CreateRefundLineItem
+                {
+                    OrderLineItemId = "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
+                    RefundAmount = new Money { Currency = "ghs", Value = 2500 },
+                    Reason = RefundReason.ItemNotAsDescribed,
+                    ReasonDetails = "Wrong size"
+                }
+            ],
+            RequestMeta = new RequestMeta { IdempotencyKey = "refund_contract_001" }
+        };
+
+        var canonical = await client.Refunds.CreateAsync(payload);
+        var alias = await client.Orders.RefundAsync(payload);
+
+        Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", canonical["refund"]?["id"]?.GetValue<string>());
+        Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", alias["refund"]?["id"]?.GetValue<string>());
+        Assert.Equal(RefundStatus.Pending, canonical.Deserialize<RefundResponse>()?.Refund?.Status);
+        Assert.Equal(RefundReason.ItemReturned, canonical.Deserialize<RefundResponse>()?.Refund?.Reason);
+        Assert.Equal(new[] { "/refunds/create", "/orders/refund" }, handler.Requests.Select(r => r.RequestUri!.AbsolutePath));
+        Assert.True(JsonNode.DeepEquals(JsonNode.Parse(handler.Bodies[0]), JsonNode.Parse(handler.Bodies[1])));
+        using var request = JsonDocument.Parse(handler.Bodies[0]);
+        Assert.Equal("oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN", request.RootElement.GetProperty("line_items")[0].GetProperty("order_line_item_id").GetString());
+        Assert.Equal(2500L, request.RootElement.GetProperty("line_items")[0].GetProperty("refund_amount").GetProperty("value").GetInt64());
+        Assert.Equal("item_returned", request.RootElement.GetProperty("reason").GetString());
     }
 
     [Fact]
