@@ -49,7 +49,7 @@ internal class ApiClient : IDisposable
     {
         var requestUri = path.StartsWith('/') ? path : "/" + path;
         var json = SerializeRequestPayload(requestUri, payload, generateIdempotencyKey: true);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         HttpResponseMessage response;
         try
