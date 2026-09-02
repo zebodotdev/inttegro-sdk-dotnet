@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 30
     environment: release
     env:
-      INTTEGRO_OPENAPI_SPEC: openapi/commerce.yml
+      INTTEGRO_OPENAPI_SPEC: ${{ github.workspace }}/openapi/commerce.yml
     permissions:
       attestations: write
       contents: write
