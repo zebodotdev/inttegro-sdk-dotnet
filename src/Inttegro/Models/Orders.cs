@@ -447,8 +447,77 @@ public sealed class Order
     [JsonPropertyName("completed_at")]
     public string? CompletedAt { get; set; }
 
+    [JsonPropertyName("refunds")]
+    public List<OrderRefund>? Refunds { get; set; }
+
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Extra { get; set; }
+}
+
+public sealed class OrderRefundLineItem
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("order_line_item_id")]
+    public string? OrderLineItemId { get; set; }
+
+    [JsonPropertyName("original_amount_paid")]
+    public Money? OriginalAmountPaid { get; set; }
+
+    [JsonPropertyName("refund_amount")]
+    public Money? RefundAmount { get; set; }
+
+    [JsonPropertyName("reason")]
+    public string? Reason { get; set; }
+
+    [JsonPropertyName("reason_details")]
+    public string? ReasonDetails { get; set; }
+}
+
+public sealed class OrderRefund
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("order_id")]
+    public string? OrderId { get; set; }
+
+    [JsonPropertyName("status")]
+    public string? Status { get; set; }
+
+    [JsonPropertyName("total")]
+    public Money? Total { get; set; }
+
+    [JsonPropertyName("line_items")]
+    public List<OrderRefundLineItem>? LineItems { get; set; }
+
+    [JsonPropertyName("reason")]
+    public string? Reason { get; set; }
+
+    [JsonPropertyName("reason_details")]
+    public string? ReasonDetails { get; set; }
+
+    [JsonPropertyName("reference")]
+    public string? Reference { get; set; }
+
+    [JsonPropertyName("custom_data")]
+    public Dictionary<string, string>? CustomData { get; set; }
+
+    [JsonPropertyName("created_at")]
+    public string? CreatedAt { get; set; }
+
+    [JsonPropertyName("processing_at")]
+    public string? ProcessingAt { get; set; }
+
+    [JsonPropertyName("succeeded_at")]
+    public string? SucceededAt { get; set; }
+
+    [JsonPropertyName("failed_at")]
+    public string? FailedAt { get; set; }
+
+    [JsonPropertyName("canceled_at")]
+    public string? CanceledAt { get; set; }
 }
 
 public sealed class OrderCreateResponse
