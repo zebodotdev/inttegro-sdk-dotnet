@@ -72,6 +72,9 @@ public sealed class CatalogPrice
     [JsonPropertyName("nominal")]
     public Amount? Nominal { get; set; }
 
+    [JsonPropertyName("product_id")]
+    public string? ProductId { get; set; }
+
     [JsonPropertyName("product")]
     public Product? Product { get; set; }
 

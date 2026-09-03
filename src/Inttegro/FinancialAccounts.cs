@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Inttegro;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(WireEnumJsonConverter<FinancialAccountType>))]
 public enum FinancialAccountType
 {
     [EnumMember(Value = "wallet")]
@@ -16,14 +16,14 @@ public enum FinancialAccountType
     DoshAccount
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(WireEnumJsonConverter<WalletType>))]
 public enum WalletType
 {
     [EnumMember(Value = "mobile_money")]
     MobileMoney
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(WireEnumJsonConverter<BankAccountType>))]
 public enum BankAccountType
 {
     [EnumMember(Value = "ghana_bank_account")]

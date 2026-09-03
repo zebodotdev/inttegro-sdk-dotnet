@@ -4,7 +4,7 @@ using Inttegro.Money;
 
 namespace Inttegro;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(WireEnumJsonConverter<BalanceTransactionType>))]
 public enum BalanceTransactionType
 {
     [EnumMember(Value = "payment")]

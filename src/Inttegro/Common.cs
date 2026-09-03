@@ -6,7 +6,7 @@ using Inttegro.Money;
 
 namespace Inttegro;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(WireEnumJsonConverter<ProductType>))]
 public enum ProductType
 {
     [EnumMember(Value = "physical")]
@@ -23,7 +23,7 @@ public enum ProductType
     Cause
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(WireEnumJsonConverter<LineItemType>))]
 public enum LineItemType
 {
     [EnumMember(Value = "product")]

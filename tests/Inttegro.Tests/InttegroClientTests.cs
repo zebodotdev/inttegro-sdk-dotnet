@@ -33,6 +33,10 @@ public class InttegroClientTests
         Assert.Equal("{\"currency\":\"ghs\",\"value\":3005}", amountJson);
         Assert.Equal("{\"currency\":\"ghs\",\"value\":3005}", priceJson);
         Assert.Equal("{\"product_id\":null,\"label\":\"Retail\",\"about\":null,\"amount\":{\"currency\":\"ghs\",\"value\":3005}}", catalogPriceJson);
+        var catalogPrice = JsonSerializer.Deserialize<CatalogPrice>(
+            "{\"id\":\"pr_123\",\"active\":true,\"nominal\":{\"currency\":\"ghs\",\"value\":3005},\"product_id\":\"prod_123\",\"created_at\":\"2026-09-02T12:00:00Z\"}"
+        );
+        Assert.Equal("prod_123", catalogPrice!.ProductId);
         Assert.Equal("\"mtn\"", networkJson);
         Assert.Equal("\"mobile_money\"", paymentMethodJson);
         Assert.Equal("\"requires_confirmation\"", paymentResultJson);
