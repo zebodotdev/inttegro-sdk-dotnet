@@ -156,12 +156,6 @@ public sealed class Refund
     public string? CanceledAt { get; set; }
 }
 
-public sealed class RefundResponse
-{
-    [JsonPropertyName("refund")]
-    public Refund? Refund { get; set; }
-}
-
 public sealed class RefundPage
 {
     [JsonPropertyName("number")]
@@ -172,12 +166,6 @@ public sealed class RefundPage
 
     [JsonPropertyName("size")]
     public int? Size { get; set; }
-}
-
-public sealed class RefundPageResponse
-{
-    [JsonPropertyName("page")]
-    public RefundPage? Page { get; set; }
 }
 
 public sealed class RefundReasonJsonConverter : JsonConverter<RefundReason>

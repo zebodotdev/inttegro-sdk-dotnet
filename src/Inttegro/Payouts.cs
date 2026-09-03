@@ -55,12 +55,6 @@ public sealed class PayoutAgingSpec
     public string? Abide { get; set; }
 }
 
-public sealed class PayoutSettingsResponse
-{
-    [JsonPropertyName("settings")]
-    public PayoutSettings? Settings { get; set; }
-}
-
 public sealed class PayoutPageRequest
 {
     [JsonPropertyName("page_number")]
@@ -68,12 +62,6 @@ public sealed class PayoutPageRequest
 
     [JsonPropertyName("page_size")]
     public int? PageSize { get; set; }
-}
-
-public sealed class PayoutPageResponse
-{
-    [JsonPropertyName("page")]
-    public PayoutPage? Page { get; set; }
 }
 
 public sealed class SchedulePayoutRequest
@@ -97,12 +85,6 @@ public sealed class CancelPayoutRequest
     public string? PayoutId { get; set; }
 }
 
-public sealed class CancelPayoutResponse
-{
-    [JsonPropertyName("payout")]
-    public PayoutSummary? Payout { get; set; }
-}
-
 public sealed class PayoutPage
 {
     [JsonPropertyName("number")]
@@ -112,10 +94,10 @@ public sealed class PayoutPage
     public int? Size { get; set; }
 
     [JsonPropertyName("payouts")]
-    public List<PayoutSummary>? Payouts { get; set; }
+    public List<Payout>? Payouts { get; set; }
 }
 
-public sealed class PayoutSummary
+public sealed class Payout
 {
     [JsonPropertyName("id")]
     public string? Id { get; set; }

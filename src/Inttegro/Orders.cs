@@ -349,7 +349,7 @@ public sealed class OrderPayment
     public Money? Amount { get; set; }
 
     [JsonPropertyName("payment_method")]
-    public PaymentMethodObject? PaymentMethod { get; set; }
+    public PaymentMethod? PaymentMethod { get; set; }
 
     [JsonPropertyName("latest_attempt")]
     public OrderPaymentAttempt? LatestAttempt { get; set; }

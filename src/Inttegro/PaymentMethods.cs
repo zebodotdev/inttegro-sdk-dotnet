@@ -224,7 +224,7 @@ public sealed class PaymentMethodDeleteRequest
     public string? PaymentMethodId { get; set; }
 }
 
-public sealed class PaymentMethodObject
+public sealed class PaymentMethod
 {
     [JsonPropertyName("id")]
     public string? Id { get; set; }
@@ -266,12 +266,6 @@ public sealed class PaymentMethodObject
     public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
-public sealed class PaymentMethodResponse
-{
-    [JsonPropertyName("payment_method")]
-    public PaymentMethodObject? PaymentMethod { get; set; }
-}
-
 public sealed class PaymentMethodTypeSetting
 {
     [JsonPropertyName("type")]
@@ -305,14 +299,14 @@ public sealed class PaymentMethodSettings
     public PaymentMethodTypeSetting? Motito { get; set; }
 }
 
-public sealed class PaymentMethodSettingsResponse
+public sealed class PaymentMethodPage
 {
-    [JsonPropertyName("settings")]
-    public PaymentMethodSettings? Settings { get; set; }
-}
+    [JsonPropertyName("number")]
+    public int? Number { get; set; }
 
-public sealed class PaymentMethodVerificationResponse
-{
-    [JsonPropertyName("verification")]
-    public JsonObject? Verification { get; set; }
+    [JsonPropertyName("size")]
+    public int? Size { get; set; }
+
+    [JsonPropertyName("payment_methods")]
+    public List<PaymentMethod>? PaymentMethods { get; set; }
 }

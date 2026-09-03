@@ -1,5 +1,4 @@
 using Inttegro.Http;
-using Inttegro.Responses;
 
 namespace Inttegro.Resources;
 
@@ -9,18 +8,18 @@ public class ChimesResource
 
     internal ChimesResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> SendAsync(object payload, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/chimes/send", payload, cancellationToken);
+    public Task<Chime> SendAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<Chime>("/chimes/send", "chime", payload, cancellationToken);
 
-    public Task<InttegroResponse> LookupAsync(string chimeId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/chimes/lookup", new { chime_id = chimeId }, cancellationToken);
+    public Task<Chime> LookupAsync(string chimeId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<Chime>("/chimes/lookup", "chime", new { chime_id = chimeId }, cancellationToken);
 
-    public Task<InttegroResponse> ScheduleAsync(object payload, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/chimes/schedule", payload, cancellationToken);
+    public Task<ScheduledChime> ScheduleAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<ScheduledChime>("/chimes/schedule", "scheduled_chime", payload, cancellationToken);
 
-    public Task<InttegroResponse> BroadcastAsync(object payload, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/chimes/broadcast", payload, cancellationToken);
+    public Task<Broadcast> BroadcastAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<Broadcast>("/chimes/broadcast", "broadcast", payload, cancellationToken);
 
-    public Task<InttegroResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/chimes/page", payload ?? new { }, cancellationToken);
+    public Task<ChimePage> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<ChimePage>("/chimes/page", "page", payload ?? new { }, cancellationToken);
 }

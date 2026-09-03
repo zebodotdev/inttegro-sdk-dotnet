@@ -5,7 +5,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Inttegro;
 using Inttegro.Errors;
-using Inttegro.Responses;
 
 namespace Inttegro.Http;
 
@@ -45,7 +44,7 @@ internal class ApiClient : IDisposable
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
-    public async Task<InttegroResponse> PostAsync(string path, object? payload = null, CancellationToken cancellationToken = default)
+    internal async Task<WireEnvelope> PostAsync(string path, object? payload = null, CancellationToken cancellationToken = default)
     {
         var requestUri = path.StartsWith('/') ? path : "/" + path;
         var json = SerializeRequestPayload(requestUri, payload, generateIdempotencyKey: true);
@@ -73,7 +72,7 @@ internal class ApiClient : IDisposable
             HandleError(response, body, parsed);
         }
 
-        return new InttegroResponse(parsed);
+        return new WireEnvelope(parsed);
     }
 
     public async Task<T> PostAsync<T>(string path, object? payload = null, CancellationToken cancellationToken = default)
@@ -96,7 +95,7 @@ internal class ApiClient : IDisposable
             ?? throw new InvalidOperationException($"Inttegro returned an invalid {field} response for {path}");
     }
 
-    public async Task<InttegroResponse> PostWithHeadersAsync(
+    internal async Task<WireEnvelope> PostWithHeadersAsync(
         string path,
         object? payload = null,
         IDictionary<string, string>? headers = null,
@@ -117,6 +116,18 @@ internal class ApiClient : IDisposable
         return await SendForJsonAsync(request, cancellationToken);
     }
 
+    internal async Task<T> PostWithHeadersAsync<T>(
+        string path,
+        object? payload = null,
+        IDictionary<string, string>? headers = null,
+        CancellationToken cancellationToken = default
+    ) where T : class
+    {
+        var envelope = await PostWithHeadersAsync(path, payload, headers, cancellationToken);
+        return envelope.Deserialize<T>()
+            ?? throw new InvalidOperationException($"Inttegro returned an invalid value for {path}");
+    }
+
     public async Task<T> PostResourceWithHeadersAsync<T>(
         string path,
         string field,
@@ -130,7 +141,7 @@ internal class ApiClient : IDisposable
             ?? throw new InvalidOperationException($"Inttegro returned an invalid {field} response for {path}");
     }
 
-    public async Task<InttegroResponse> PostMultipartAsync(
+    internal async Task<WireEnvelope> PostMultipartAsync(
         string pathOrUrl,
         IDictionary<string, object?> fields,
         IDictionary<string, string> files,
@@ -166,6 +177,33 @@ internal class ApiClient : IDisposable
             request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
         return await SendForJsonAsync(request, cancellationToken);
+    }
+
+    internal async Task<T> PostMultipartAsync<T>(
+        string pathOrUrl,
+        IDictionary<string, object?> fields,
+        IDictionary<string, string> files,
+        IDictionary<string, string>? headers = null,
+        CancellationToken cancellationToken = default
+    ) where T : class
+    {
+        var envelope = await PostMultipartAsync(pathOrUrl, fields, files, headers, cancellationToken);
+        return envelope.Deserialize<T>()
+            ?? throw new InvalidOperationException($"Inttegro returned an invalid value for {pathOrUrl}");
+    }
+
+    internal async Task<T> PostMultipartResourceAsync<T>(
+        string pathOrUrl,
+        string field,
+        IDictionary<string, object?> fields,
+        IDictionary<string, string> files,
+        IDictionary<string, string>? headers = null,
+        CancellationToken cancellationToken = default
+    ) where T : class
+    {
+        var envelope = await PostMultipartAsync(pathOrUrl, fields, files, headers, cancellationToken);
+        return envelope[field]?.Deserialize<T>()
+            ?? throw new InvalidOperationException($"Inttegro returned an invalid {field} value for {pathOrUrl}");
     }
 
     public async Task<FileDownload> PostBinaryJsonAsync(string path, object payload, CancellationToken cancellationToken = default)
@@ -269,7 +307,7 @@ internal class ApiClient : IDisposable
         return $"{hex[..8]}-{hex[8..12]}-{hex[12..16]}-{hex[16..20]}-{hex[20..]}";
     }
 
-    private async Task<InttegroResponse> SendForJsonAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    private async Task<WireEnvelope> SendForJsonAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         HttpResponseMessage response;
         try
@@ -291,7 +329,7 @@ internal class ApiClient : IDisposable
         {
             HandleError(response, body, parsed);
         }
-        return new InttegroResponse(parsed);
+        return new WireEnvelope(parsed);
     }
 
     private async Task<FileDownload> SendForDownloadAsync(HttpRequestMessage request, CancellationToken cancellationToken)

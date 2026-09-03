@@ -1,5 +1,4 @@
 using Inttegro.Http;
-using Inttegro.Responses;
 
 namespace Inttegro.Resources;
 
@@ -9,30 +8,30 @@ public sealed class FilesResource
 
     internal FilesResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
+    public Task<StoredFile> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
         CreateAsync(payload, idempotencyKey: null, cancellationToken);
 
-    public Task<InttegroResponse> CreateAsync(object payload, string? idempotencyKey, CancellationToken cancellationToken = default)
+    public Task<StoredFile> CreateAsync(object payload, string? idempotencyKey, CancellationToken cancellationToken = default)
     {
         var values = ToDictionary(payload);
         var headers = Headers(idempotencyKey ?? values.GetValueOrDefault("idempotency_key")?.ToString());
         values.Remove("idempotency_key");
         var file = values["file"]?.ToString() ?? throw new ArgumentException("file is required");
         values.Remove("file");
-        return _client.PostMultipartAsync("/files/create", values, new Dictionary<string, string> { ["file"] = file }, headers, cancellationToken);
+        return _client.PostMultipartResourceAsync<StoredFile>("/files/create", "file", values, new Dictionary<string, string> { ["file"] = file }, headers, cancellationToken);
     }
 
-    public Task<InttegroResponse> LookupAsync(string fileId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/files/lookup", new { file_id = fileId }, cancellationToken);
+    public Task<StoredFile> LookupAsync(string fileId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<StoredFile>("/files/lookup", "file", new { file_id = fileId }, cancellationToken);
 
-    public Task<InttegroResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/files/page", payload ?? new { }, cancellationToken);
+    public Task<StoredFilePage> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<StoredFilePage>("/files/page", "page", payload ?? new { }, cancellationToken);
 
     public Task<FileDownload> ContentsAsync(object payload, CancellationToken cancellationToken = default) =>
         _client.PostBinaryJsonAsync("/files/contents", payload, cancellationToken);
 
-    public Task<InttegroResponse> DeleteAsync(string fileId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/files/delete", new { file_id = fileId }, cancellationToken);
+    public Task<StoredFile> DeleteAsync(string fileId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<StoredFile>("/files/delete", "file", new { file_id = fileId }, cancellationToken);
 
     private static Dictionary<string, object?> ToDictionary(object payload) =>
         payload.GetType().GetProperties().ToDictionary(p => p.Name, p => p.GetValue(payload));

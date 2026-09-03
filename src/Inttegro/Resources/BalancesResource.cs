@@ -1,5 +1,4 @@
 using Inttegro.Http;
-using Inttegro.Responses;
 
 namespace Inttegro.Resources;
 
@@ -9,6 +8,6 @@ public class BalancesResource
 
     internal BalancesResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> GetAsync(CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/balances", new { }, cancellationToken);
+    public Task<BalanceSnapshot> GetAsync(CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<BalanceSnapshot>("/balances", "balances", new { }, cancellationToken);
 }

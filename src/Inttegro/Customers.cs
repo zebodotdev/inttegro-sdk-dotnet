@@ -108,12 +108,6 @@ public sealed class Customer
     public string? CreatedAt { get; set; }
 }
 
-public sealed class CustomerResponse
-{
-    [JsonPropertyName("customer")]
-    public Customer? Customer { get; set; }
-}
-
 public sealed class CustomersPage
 {
     [JsonPropertyName("number")]
@@ -124,10 +118,4 @@ public sealed class CustomersPage
 
     [JsonPropertyName("customers")]
     public List<Customer>? Customers { get; set; }
-}
-
-public sealed class CustomersPageResponse
-{
-    [JsonPropertyName("page")]
-    public CustomersPage? Page { get; set; }
 }

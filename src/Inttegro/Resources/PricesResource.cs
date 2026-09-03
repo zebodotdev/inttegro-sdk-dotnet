@@ -1,6 +1,5 @@
 using Inttegro.Http;
 using Inttegro;
-using Inttegro.Responses;
 using Inttegro.Validation;
 
 namespace Inttegro.Resources;
@@ -11,43 +10,43 @@ public class PricesResource
 
     internal PricesResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/prices/create", payload, cancellationToken);
+    public Task<Price> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<Price>("/prices/create", "price", payload, cancellationToken);
 
-    public Task<InttegroResponse> CreateAsync(CreatePriceRequest payload, CancellationToken cancellationToken = default)
+    public Task<Price> CreateAsync(CreatePriceRequest payload, CancellationToken cancellationToken = default)
     {
         RequestValidator.Require(payload.Currency, "currency");
         RequestValidator.Require(payload.Amount, "amount");
-        return _client.PostAsync("/prices/create", payload, cancellationToken);
+        return _client.PostResourceAsync<Price>("/prices/create", "price", payload, cancellationToken);
     }
 
-    public Task<InttegroResponse> LookupAsync(string priceId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/prices/lookup", new { price_id = priceId }, cancellationToken);
+    public Task<Price> LookupAsync(string priceId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<Price>("/prices/lookup", "price", new { price_id = priceId }, cancellationToken);
 
-    public Task<InttegroResponse> LookupAsync(LookupPriceRequest payload, CancellationToken cancellationToken = default)
+    public Task<Price> LookupAsync(LookupPriceRequest payload, CancellationToken cancellationToken = default)
     {
         RequestValidator.Require(payload.PriceId, "price_id");
-        return _client.PostAsync("/prices/lookup", payload, cancellationToken);
+        return _client.PostResourceAsync<Price>("/prices/lookup", "price", payload, cancellationToken);
     }
 
-    public Task<InttegroResponse> UpdateAsync(UpdatePriceRequest payload, CancellationToken cancellationToken = default)
+    public Task<Price> UpdateAsync(UpdatePriceRequest payload, CancellationToken cancellationToken = default)
     {
         RequestValidator.Require(payload.PriceId, "price_id");
-        return _client.PostAsync("/prices/update", payload, cancellationToken);
+        return _client.PostResourceAsync<Price>("/prices/update", "price", payload, cancellationToken);
     }
 
-    public Task<InttegroResponse> ActivateAsync(string priceId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/prices/activate", new { price_id = priceId }, cancellationToken);
+    public Task<Price> ActivateAsync(string priceId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<Price>("/prices/activate", "price", new { price_id = priceId }, cancellationToken);
 
-    public Task<InttegroResponse> DeactivateAsync(string priceId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/prices/deactivate", new { price_id = priceId }, cancellationToken);
+    public Task<Price> DeactivateAsync(string priceId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<Price>("/prices/deactivate", "price", new { price_id = priceId }, cancellationToken);
 
-    public Task<InttegroResponse> ArchiveAsync(string priceId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/prices/archive", new { price_id = priceId }, cancellationToken);
+    public Task<Price> ArchiveAsync(string priceId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<Price>("/prices/archive", "price", new { price_id = priceId }, cancellationToken);
 
-    public Task<InttegroResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/prices/page", payload ?? new { }, cancellationToken);
+    public Task<PricePage> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<PricePage>("/prices/page", "page", payload ?? new { }, cancellationToken);
 
-    public Task<InttegroResponse> PageAsync(PricePageRequest payload, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/prices/page", payload, cancellationToken);
+    public Task<PricePage> PageAsync(PricePageRequest payload, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<PricePage>("/prices/page", "page", payload, cancellationToken);
 }

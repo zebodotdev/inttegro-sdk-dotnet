@@ -53,7 +53,7 @@ public static class ApiEnums
     public static class OrderPaymentStatus { public const string Initiated = "initiated", RequiresAction = "requires_action", Overdue = "overdue", Executed = "executed", Paid = "paid", Canceled = "canceled", Expired = "expired", Failed = "failed", Unknown = "unknown"; }
     public static class PaymentAttemptStatus { public const string Initiated = "initiated", Executed = "executed", Succeeded = "succeeded", Canceled = "canceled", Expired = "expired", Failed = "failed", Unknown = "unknown"; }
     public static class CheckoutPaymentStatus { public const string RequiresAction = "requires_action", Processing = "processing", Succeeded = "succeeded", Failed = "failed", Cancelled = "cancelled"; }
-    public static class PaymentResponseStatus { public const string Pending = "pending", RequiresConfirmation = "requires_confirmation", Processing = "processing", Succeeded = "succeeded", Failed = "failed"; }
+    public static class PaymentResultStatus { public const string Pending = "pending", RequiresConfirmation = "requires_confirmation", Processing = "processing", Succeeded = "succeeded", Failed = "failed"; }
     public static class OrderCreatedFromResourceType { public const string PurchaseIntent = "purchase_intent"; }
 
     public static class RefundReason { public const string RequestedByCustomer = "requested_by_customer", Duplicate = "duplicate", Fraudulent = "fraudulent", OrderCanceled = "order_canceled", ItemReturned = "item_returned", ItemDamaged = "item_damaged", ItemNotReceived = "item_not_received", ItemNotAsDescribed = "item_not_as_described", Custom = "custom"; }

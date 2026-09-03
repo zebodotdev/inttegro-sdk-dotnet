@@ -1,5 +1,4 @@
 using Inttegro.Http;
-using Inttegro.Responses;
 
 namespace Inttegro.Resources;
 
@@ -9,9 +8,9 @@ public class SchedulesResource
 
     internal SchedulesResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> LookupAsync(string scheduleId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/schedules/lookup", new { schedule_id = scheduleId }, cancellationToken);
+    public Task<ScheduledChime> LookupAsync(string scheduleId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<ScheduledChime>("/schedules/lookup", "scheduled_chime", new { schedule_id = scheduleId }, cancellationToken);
 
-    public Task<InttegroResponse> CancelAsync(string scheduleId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/schedules/cancel", new { schedule_id = scheduleId }, cancellationToken);
+    public Task<ScheduledChime> CancelAsync(string scheduleId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<ScheduledChime>("/schedules/cancel", "scheduled_chime", new { schedule_id = scheduleId }, cancellationToken);
 }

@@ -299,24 +299,6 @@ public sealed class Product
     public string? ArchivedAt { get; set; }
 }
 
-public sealed class ProductResponse
-{
-    [JsonPropertyName("product")]
-    public Product? Product { get; set; }
-
-    [JsonPropertyName("error")]
-    public ApiError? Error { get; set; }
-}
-
-public sealed class AddProductPriceResponse
-{
-    [JsonPropertyName("price")]
-    public ProductDefaultUnitPrice? Price { get; set; }
-
-    [JsonPropertyName("error")]
-    public ApiError? Error { get; set; }
-}
-
 public sealed class ProductPage
 {
     [JsonPropertyName("number")]
@@ -327,13 +309,4 @@ public sealed class ProductPage
 
     [JsonPropertyName("products")]
     public List<Product>? Products { get; set; }
-}
-
-public sealed class PageProductsResponse
-{
-    [JsonPropertyName("page")]
-    public ProductPage? Page { get; set; }
-
-    [JsonPropertyName("error")]
-    public ApiError? Error { get; set; }
 }

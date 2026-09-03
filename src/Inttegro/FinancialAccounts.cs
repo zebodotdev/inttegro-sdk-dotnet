@@ -261,12 +261,6 @@ public sealed class FinancialAccountToggleRequest
     public bool? UnsetAsPayoutDestination { get; set; }
 }
 
-public sealed class FinancialAccountResponse
-{
-    [JsonPropertyName("account")]
-    public FinancialAccount? Account { get; set; }
-}
-
 public sealed class FinancialAccountLookupRequest
 {
     [JsonPropertyName("account_id")]
@@ -289,12 +283,6 @@ public sealed class FinancialAccountPageRequest
 
     [JsonPropertyName("page_size")]
     public int? PageSize { get; set; }
-}
-
-public sealed class FinancialAccountPageResponse
-{
-    [JsonPropertyName("page")]
-    public FinancialAccountPage? Page { get; set; }
 }
 
 public sealed class FinancialAccountPage

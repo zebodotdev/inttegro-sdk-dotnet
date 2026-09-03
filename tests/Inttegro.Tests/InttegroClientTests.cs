@@ -362,10 +362,10 @@ public class InttegroClientTests
         var canonical = await client.Refunds.CreateAsync(payload);
         var alias = await client.Orders.RefundAsync(payload);
 
-        Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", canonical["refund"]?["id"]?.GetValue<string>());
+        Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", canonical.Id);
         Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", alias.Id);
-        Assert.Equal(RefundStatus.Pending, canonical.Deserialize<RefundResponse>()?.Refund?.Status);
-        Assert.Equal(RefundReason.ItemReturned, canonical.Deserialize<RefundResponse>()?.Refund?.Reason);
+        Assert.Equal(RefundStatus.Pending, canonical.Status);
+        Assert.Equal(RefundReason.ItemReturned, canonical.Reason);
         Assert.Equal(new[] { "/refunds/create", "/orders/refund" }, handler.Requests.Select(r => r.RequestUri!.AbsolutePath));
         Assert.True(JsonNode.DeepEquals(JsonNode.Parse(handler.Bodies[0]), JsonNode.Parse(handler.Bodies[1])));
         using var request = JsonDocument.Parse(handler.Bodies[0]);

@@ -1,5 +1,4 @@
 using Inttegro.Http;
-using Inttegro.Responses;
 
 namespace Inttegro.Resources;
 
@@ -9,17 +8,17 @@ public sealed class FileLinksResource
 
     internal FileLinksResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> CreateAsync(object payload, string? idempotencyKey = null, CancellationToken cancellationToken = default) =>
-        _client.PostWithHeadersAsync("/file_links/create", payload, Headers(idempotencyKey), cancellationToken);
+    public Task<FileLinkCreation> CreateAsync(object payload, string? idempotencyKey = null, CancellationToken cancellationToken = default) =>
+        _client.PostWithHeadersAsync<FileLinkCreation>("/file_links/create", payload, Headers(idempotencyKey), cancellationToken);
 
-    public Task<InttegroResponse> LookupAsync(string id, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/file_links/lookup", new { id }, cancellationToken);
+    public Task<FileLink> LookupAsync(string id, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<FileLink>("/file_links/lookup", "file_link", new { id }, cancellationToken);
 
-    public Task<InttegroResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/file_links/page", payload ?? new { }, cancellationToken);
+    public Task<FileLinkPage> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<FileLinkPage>("/file_links/page", "page", payload ?? new { }, cancellationToken);
 
-    public Task<InttegroResponse> RevokeAsync(object payload, string? idempotencyKey = null, CancellationToken cancellationToken = default) =>
-        _client.PostWithHeadersAsync("/file_links/revoke", payload, Headers(idempotencyKey), cancellationToken);
+    public Task<FileLink> RevokeAsync(object payload, string? idempotencyKey = null, CancellationToken cancellationToken = default) =>
+        _client.PostResourceWithHeadersAsync<FileLink>("/file_links/revoke", "file_link", payload, Headers(idempotencyKey), cancellationToken);
 
     public async Task<FileDownload> OpenAsync(string url, string? saveTo = null, CancellationToken cancellationToken = default)
     {

@@ -1,5 +1,4 @@
 using Inttegro.Http;
-using Inttegro.Responses;
 
 namespace Inttegro.Resources;
 
@@ -9,6 +8,6 @@ public class FileReferencesResource
 
     internal FileReferencesResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> ReconcileAsync(object payload, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/file_references/reconcile", payload, cancellationToken);
+    public Task<FileReferenceReconciliation> ReconcileAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostAsync<FileReferenceReconciliation>("/file_references/reconcile", payload, cancellationToken);
 }

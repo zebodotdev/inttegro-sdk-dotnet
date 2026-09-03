@@ -92,11 +92,14 @@ public sealed class Price
     public string? ArchivedAt { get; set; }
 }
 
-public sealed class PriceResponse
+public sealed class PricePage
 {
-    [JsonPropertyName("price")]
-    public Price? Price { get; set; }
+    [JsonPropertyName("number")]
+    public int? Number { get; set; }
 
-    [JsonPropertyName("error")]
-    public ApiError? Error { get; set; }
+    [JsonPropertyName("size")]
+    public int? Size { get; set; }
+
+    [JsonPropertyName("prices")]
+    public List<Price>? Prices { get; set; }
 }

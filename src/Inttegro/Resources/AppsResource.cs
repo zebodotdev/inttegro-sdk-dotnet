@@ -1,5 +1,4 @@
 using Inttegro.Http;
-using Inttegro.Responses;
 
 namespace Inttegro.Resources;
 
@@ -9,12 +8,12 @@ public class AppsResource
 
     internal AppsResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/apps/create", payload, cancellationToken);
+    public Task<App> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<App>("/apps/create", "app", payload, cancellationToken);
 
-    public Task<InttegroResponse> LookupAsync(CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/apps/lookup", new { }, cancellationToken);
+    public Task<App> LookupAsync(CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<App>("/apps/lookup", "app", new { }, cancellationToken);
 
-    public Task<InttegroResponse> UpdateAsync(object payload, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/apps/update", payload, cancellationToken);
+    public Task<App> UpdateAsync(object payload, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<App>("/apps/update", "app", payload, cancellationToken);
 }

@@ -1,5 +1,4 @@
 using Inttegro.Http;
-using Inttegro.Responses;
 
 namespace Inttegro.Resources;
 
@@ -9,9 +8,9 @@ public class BalanceTransactionsResource
 
     internal BalanceTransactionsResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> LookupAsync(string transactionId, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/balance_transactions/lookup", new { transaction_id = transactionId }, cancellationToken);
+    public Task<BalanceTransaction> LookupAsync(string transactionId, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<BalanceTransaction>("/balance_transactions/lookup", "transaction", new { transaction_id = transactionId }, cancellationToken);
 
-    public Task<InttegroResponse> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
-        _client.PostAsync("/balance_transactions/page", payload ?? new { }, cancellationToken);
+    public Task<BalanceTransactionPage> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<BalanceTransactionPage>("/balance_transactions/page", "page", payload ?? new { }, cancellationToken);
 }

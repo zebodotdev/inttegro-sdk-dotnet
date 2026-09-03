@@ -1,6 +1,5 @@
 using Inttegro.Http;
 using Inttegro;
-using Inttegro.Responses;
 using Inttegro.Validation;
 
 namespace Inttegro.Resources;
@@ -11,72 +10,74 @@ public sealed class RefundsResource
 
     internal RefundsResource(ApiClient client) => _client = client;
 
-    public Task<InttegroResponse> CreateAsync(
+    public Task<Refund> CreateAsync(
         CreateRefundRequest payload,
         CancellationToken cancellationToken = default
     ) => CreateAsync(payload, idempotencyKey: null, cancellationToken);
 
-    public Task<InttegroResponse> CreateAsync(
+    public Task<Refund> CreateAsync(
         CreateRefundRequest payload,
         string? idempotencyKey,
         CancellationToken cancellationToken = default
     )
     {
         ValidateCreate(payload);
-        return _client.PostWithHeadersAsync(
+        return _client.PostResourceWithHeadersAsync<Refund>(
             "/refunds/create",
+            "refund",
             payload,
             IdempotencyHeaders(idempotencyKey),
             cancellationToken
         );
     }
 
-    public Task<InttegroResponse> CancelAsync(
+    public Task<Refund> CancelAsync(
         string refundId,
         CancellationToken cancellationToken = default
     ) => CancelAsync(new CancelRefundRequest { RefundId = refundId }, idempotencyKey: null, cancellationToken);
 
-    public Task<InttegroResponse> CancelAsync(
+    public Task<Refund> CancelAsync(
         CancelRefundRequest payload,
         CancellationToken cancellationToken = default
     ) => CancelAsync(payload, idempotencyKey: null, cancellationToken);
 
-    public Task<InttegroResponse> CancelAsync(
+    public Task<Refund> CancelAsync(
         CancelRefundRequest payload,
         string? idempotencyKey,
         CancellationToken cancellationToken = default
     )
     {
         RequestValidator.Require(payload.RefundId, "refund_id");
-        return _client.PostWithHeadersAsync(
+        return _client.PostResourceWithHeadersAsync<Refund>(
             "/refunds/cancel",
+            "refund",
             payload,
             IdempotencyHeaders(idempotencyKey),
             cancellationToken
         );
     }
 
-    public Task<InttegroResponse> LookupAsync(
+    public Task<Refund> LookupAsync(
         string refundId,
         CancellationToken cancellationToken = default
     ) => LookupAsync(new LookupRefundRequest { RefundId = refundId }, cancellationToken);
 
-    public Task<InttegroResponse> LookupAsync(
+    public Task<Refund> LookupAsync(
         LookupRefundRequest payload,
         CancellationToken cancellationToken = default
     )
     {
         RequestValidator.Require(payload.RefundId, "refund_id");
-        return _client.PostAsync("/refunds/lookup", payload, cancellationToken);
+        return _client.PostResourceAsync<Refund>("/refunds/lookup", "refund", payload, cancellationToken);
     }
 
-    public Task<InttegroResponse> PageAsync(
+    public Task<RefundPage> PageAsync(
         PageRefundsRequest payload,
         CancellationToken cancellationToken = default
     )
     {
         RequestValidator.Require(payload.PageNumber, "page_number");
-        return _client.PostAsync("/refunds/page", payload, cancellationToken);
+        return _client.PostResourceAsync<RefundPage>("/refunds/page", "page", payload, cancellationToken);
     }
 
     internal static void ValidateCreate(CreateRefundRequest payload)
