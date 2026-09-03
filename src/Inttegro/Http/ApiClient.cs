@@ -40,7 +40,7 @@ internal class ApiClient : IDisposable
 
         _httpClient.BaseAddress = new Uri(baseUrl.TrimEnd('/'));
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("inttegro-sdk-dotnet/2.0.0");
+        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("inttegro-sdk-dotnet/3.0.1");
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 

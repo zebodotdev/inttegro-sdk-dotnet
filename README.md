@@ -6,7 +6,7 @@ The official .NET client for building server-side Inttegro integrations.
 
 > **Fastest, most modern path:** connect an agent to [Inttegro MCP](https://studio.inttegro.com/inttegro-mcp) at `https://mcp.inttegro.com`, then ask it to run `design_integration`. It will produce an implementation and test plan for your application. Use this SDK when you are ready to connect that plan to your .NET service.
 
-All official Inttegro SDKs expose the same API capabilities. This package adds .NET-specific models, async APIs, and transport integration.
+All official Inttegro SDKs expose the same API capabilities. This package adds .NET-specific domain types, async APIs, and transport integration.
 
 ## Install
 
@@ -88,7 +88,7 @@ Amounts use integer minor units: `5000` GHS is GHS 50.00. Reuse the same idempot
 Refunds target paid order line items and return money to the original payment method:
 
 ```csharp
-var response = await inttegro.Refunds.CreateAsync(new CreateRefundRequest
+var refund = await inttegro.Refunds.CreateAsync(new CreateRefundRequest
 {
     OrderId = "or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
     Reason = RefundReason.ItemReturned,
@@ -102,8 +102,7 @@ var response = await inttegro.Refunds.CreateAsync(new CreateRefundRequest
     ]
 });
 
-var refund = response.Deserialize<RefundResponse>()?.Refund;
-Console.WriteLine($"{refund?.Id} {refund?.Status} {refund?.Total?.Value}");
+Console.WriteLine($"{refund.Id} {refund.Status} {refund.Total?.Value}");
 ```
 
 Use `Refunds.CancelAsync`, `Refunds.LookupAsync`, and `Refunds.PageAsync` to manage the refund lifecycle. `Orders.RefundAsync` remains a compatibility alias and returns the created `Refund` directly.
@@ -114,9 +113,9 @@ The SDK covers orders and checkout, customers, products and prices, purchase int
 
 .NET-specific features:
 
-- Nullable-aware typed request models and public enum constants.
+- Nullable-aware typed request and domain types with public enum constants.
 - Async resource methods with `CancellationToken` support.
-- `InttegroResponse` for flexible `JsonNode` access and `Deserialize<T>()` for typed responses.
+- Concrete domain objects and pages returned directly from every resource method.
 - Injectable `HttpClient`, base URL, and timeout for connection reuse and tests.
 - Structured authentication, rate-limit, network, timeout, and API exceptions.
 
@@ -128,7 +127,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify Inttegro.2.0.0.nupkg \
+gh attestation verify Inttegro.3.0.1.nupkg \
   --repo zebodotdev/inttegro-sdk-dotnet
 ```
 
