@@ -438,13 +438,7 @@ public class InttegroClientTests
         {
             Requests.Add(request);
             Bodies.Add(request.Content == null ? "" : await request.Content.ReadAsStringAsync(cancellationToken));
-            var responseBody = ResponseBody ?? (request.RequestUri!.AbsolutePath switch
-            {
-                "/orders/refund" => "{\"refund\":{\"id\":\"rf_123\"}}",
-                "/orders/page" => "{\"page\":{\"number\":0,\"size\":0,\"orders\":[]}}",
-                var path when path.StartsWith("/orders/", StringComparison.Ordinal) => "{\"order\":{\"id\":\"or_123\"}}",
-                _ => "{\"ok\":true}"
-            });
+            var responseBody = ResponseBody ?? DefaultResponseBody(request.RequestUri!.AbsolutePath);
             var response = new HttpResponseMessage(StatusCode)
             {
                 Content = new StringContent(responseBody, Encoding.UTF8, "application/json")
@@ -452,5 +446,67 @@ public class InttegroClientTests
             response.Headers.Date = DateTimeOffset.UtcNow;
             return response;
         }
+
+        private static string DefaultResponseBody(string path) => path switch
+        {
+            "/orders/refund" => "{\"refund\":{\"id\":\"rf_123\"}}",
+            "/orders/page" => "{\"page\":{\"number\":0,\"size\":0,\"orders\":[]}}",
+            "/orders/send_invoice" or "/orders/send_receipt" => "{}",
+            var value when value.StartsWith("/orders/", StringComparison.Ordinal) => "{\"order\":{\"id\":\"or_123\"}}",
+
+            "/refunds/page" => "{\"page\":{}}",
+            var value when value.StartsWith("/refunds/", StringComparison.Ordinal) => "{\"refund\":{}}",
+
+            "/payment_methods/verify" => "{\"verification\":{}}",
+            "/payment_methods/page" => "{\"page\":{}}",
+            "/payment_methods/settings" => "{\"settings\":{}}",
+            "/payment_methods/delete" => "{}",
+            var value when value.StartsWith("/payment_methods/", StringComparison.Ordinal) => "{\"payment_method\":{}}",
+
+            "/payouts/page" => "{\"page\":{}}",
+            "/payouts/lookup" or "/payouts/schedule" or "/payouts/cancel" => "{\"payout\":{}}",
+            var value when value.StartsWith("/payouts/", StringComparison.Ordinal) => "{\"settings\":{}}",
+
+            "/balance_transactions/page" => "{\"page\":{}}",
+            "/balance_transactions/lookup" => "{\"transaction\":{}}",
+            "/financial_accounts/page" => "{\"page\":{}}",
+            var value when value.StartsWith("/financial_accounts/", StringComparison.Ordinal) => "{\"account\":{}}",
+            "/customers/page" => "{\"page\":{}}",
+            var value when value.StartsWith("/customers/", StringComparison.Ordinal) => "{\"customer\":{}}",
+
+            "/products/add_price" => "{\"price\":{}}",
+            "/products/page" => "{\"page\":{}}",
+            var value when value.StartsWith("/products/", StringComparison.Ordinal) => "{\"product\":{}}",
+            "/prices/page" => "{\"page\":{}}",
+            var value when value.StartsWith("/prices/", StringComparison.Ordinal) => "{\"price\":{}}",
+
+            "/chimes/schedule" => "{\"scheduled_chime\":{}}",
+            "/chimes/broadcast" => "{\"broadcast\":{}}",
+            "/chimes/page" => "{\"page\":{}}",
+            var value when value.StartsWith("/chimes/", StringComparison.Ordinal) => "{\"chime\":{}}",
+            var value when value.StartsWith("/schedules/", StringComparison.Ordinal) => "{\"scheduled_chime\":{}}",
+            var value when value.StartsWith("/broadcasts/", StringComparison.Ordinal) => "{\"broadcast\":{}}",
+
+            "/otp/verify" => "{}",
+            var value when value.StartsWith("/otp/", StringComparison.Ordinal) => "{\"transaction\":{}}",
+            var value when value.StartsWith("/apps/", StringComparison.Ordinal) => "{\"app\":{}}",
+            "/keys/page" => "{\"page\":{}}",
+            "/keys/usage" => "{}",
+            var value when value.StartsWith("/keys/", StringComparison.Ordinal) => "{\"key\":{}}",
+
+            "/file_references/reconcile" => "{}",
+            "/purchase_intents/page" => "{\"page\":{}}",
+            var value when value.StartsWith("/purchase_intents/", StringComparison.Ordinal) => "{\"purchase_intent\":{}}",
+            "/spec/countries" => "{\"countries\":{}}",
+            "/balances" => "{\"balances\":{}}",
+
+            "/files/page" or "/file_links/page" or "/upload_requests/page" or "/message_templates/page" => "{\"page\":{}}",
+            var value when value.StartsWith("/files/", StringComparison.Ordinal) => "{\"file\":{}}",
+            var value when value.StartsWith("/file_links/", StringComparison.Ordinal) => "{\"file_link\":{}}",
+            var value when value.StartsWith("/upload_requests/", StringComparison.Ordinal) => "{\"upload_request\":{}}",
+            "/message_templates/render_preview" => "{}",
+            var value when value.StartsWith("/message_templates/", StringComparison.Ordinal) => "{\"message_template\":{}}",
+            _ => "{}"
+        };
     }
 }
