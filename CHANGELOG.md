@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [6.0.0] - 2026-09-03
+
+- Breaking: moved wallet types into the `Inttegro.Wallets` namespace.
+- Breaking: moved financial-account bank types into the `Inttegro.BankAccounts` namespace.
+- Kept financial-account lifecycle types in the root `Inttegro` namespace.
+
 ## [5.0.0] - 2026-09-03
 
 - Breaking: replaced the catch-all `ApiEnums` constant container with native top-level domain enum types.

@@ -2,6 +2,8 @@ using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Inttegro.BankAccounts;
+using Inttegro.Wallets;
 
 namespace Inttegro;
 
@@ -16,20 +18,6 @@ public enum FinancialAccountType
     DoshAccount
 }
 
-[JsonConverter(typeof(WireEnumJsonConverter<WalletType>))]
-public enum WalletType
-{
-    [EnumMember(Value = "mobile_money")]
-    MobileMoney
-}
-
-[JsonConverter(typeof(WireEnumJsonConverter<BankAccountType>))]
-public enum BankAccountType
-{
-    [EnumMember(Value = "ghana_bank_account")]
-    GhanaBankAccount
-}
-
 public sealed class PullPushConfig
 {
     [JsonPropertyName("enabled")]
@@ -40,102 +28,6 @@ public sealed class PullPushConfig
 
     [JsonPropertyName("mandate")]
     public JsonObject? Mandate { get; set; }
-}
-
-public sealed class WalletMobileMoney
-{
-    [JsonPropertyName("id")]
-    public string? Id { get; set; }
-
-    [JsonPropertyName("account_number")]
-    public string? AccountNumber { get; set; }
-
-    [JsonPropertyName("network")]
-    public string? Network { get; set; }
-}
-
-public sealed class WalletConfig
-{
-    [JsonPropertyName("type")]
-    public WalletType Type { get; set; }
-
-    [JsonPropertyName("mobile_money")]
-    public WalletMobileMoney? MobileMoney { get; set; }
-}
-
-public sealed class BankAccountOwnerAddress
-{
-    [JsonPropertyName("id")]
-    public string? Id { get; set; }
-
-    [JsonPropertyName("application_id")]
-    public string? ApplicationId { get; set; }
-
-    [JsonPropertyName("name")]
-    public string? Name { get; set; }
-
-    [JsonPropertyName("phone")]
-    public string? Phone { get; set; }
-
-    [JsonPropertyName("line_1")]
-    public string? Line1 { get; set; }
-
-    [JsonPropertyName("line_2")]
-    public string? Line2 { get; set; }
-
-    [JsonPropertyName("city")]
-    public string? City { get; set; }
-
-    [JsonPropertyName("region")]
-    public string? Region { get; set; }
-
-    [JsonPropertyName("post_code")]
-    public string? PostCode { get; set; }
-
-    [JsonPropertyName("country")]
-    public string? Country { get; set; }
-}
-
-public sealed class BankAccountOwner
-{
-    [JsonPropertyName("name")]
-    public string? Name { get; set; }
-
-    [JsonPropertyName("address")]
-    public BankAccountOwnerAddress? Address { get; set; }
-}
-
-public sealed class GhanaBankAccount
-{
-    [JsonPropertyName("bank_name")]
-    public string? BankName { get; set; }
-
-    [JsonPropertyName("branch")]
-    public string? Branch { get; set; }
-
-    [JsonPropertyName("number")]
-    public string? Number { get; set; }
-
-    [JsonPropertyName("sort_code")]
-    public string? SortCode { get; set; }
-
-    [JsonPropertyName("swift_code")]
-    public string? SwiftCode { get; set; }
-
-    [JsonPropertyName("holder")]
-    public BankAccountOwner? Holder { get; set; }
-}
-
-public sealed class BankAccountConfig
-{
-    [JsonPropertyName("id")]
-    public string? Id { get; set; }
-
-    [JsonPropertyName("type")]
-    public BankAccountType Type { get; set; }
-
-    [JsonPropertyName("ghana_bank_account")]
-    public GhanaBankAccount? GhanaBankAccount { get; set; }
 }
 
 public sealed class FinancialAccountCreateRequest
