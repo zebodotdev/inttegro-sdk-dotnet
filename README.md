@@ -54,17 +54,17 @@ try
             RedirectUrl = "https://example.com/orders/complete",
             CancelUrl = "https://example.com/cart"
         },
-        LineItems = new List<LineItem>
+        LineItems = new List<LineItemParams>
         {
             new()
             {
                 Type = LineItemType.Product,
-                Product = new ProductDetails
+                Product = new ProductDetailsParams
                 {
                     Type = ProductType.Digital,
                     Name = "Monthly subscription",
                     Quantity = 1,
-                    Price = new Money { Currency = "ghs", Value = 5000 }
+                    Price = new PriceParams { Currency = Inttegro.Money.Currency.GHS, Value = 5000 }
                 }
             }
         }
@@ -97,7 +97,11 @@ var refund = await inttegro.Refunds.CreateAsync(new CreateRefundRequest
         new CreateRefundLineItem
         {
             OrderLineItemId = "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-            RefundAmount = new Money { Currency = "ghs", Value = 2500 }
+            RefundAmount = new Inttegro.Money.AmountParams
+            {
+                Currency = Inttegro.Money.Currency.GHS,
+                Value = 2500
+            }
         }
     ]
 });
@@ -127,7 +131,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify Inttegro.3.0.1.nupkg \
+gh attestation verify Inttegro.4.0.0.nupkg \
   --repo zebodotdev/inttegro-sdk-dotnet
 ```
 

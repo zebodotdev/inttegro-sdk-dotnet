@@ -1,22 +1,9 @@
-using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Inttegro.Money;
 
 namespace Inttegro;
-
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum PaymentMethodType
-{
-    [EnumMember(Value = "mobile_money")]
-    MobileMoney,
-    [EnumMember(Value = "bank_account")]
-    BankAccount,
-    [EnumMember(Value = "card")]
-    Card,
-    [EnumMember(Value = "motito")]
-    Motito
-}
 
 public sealed class OrderPayoutSettings
 {
@@ -25,21 +12,6 @@ public sealed class OrderPayoutSettings
 
     [JsonPropertyName("enable_fx")]
     public bool? EnableFx { get; set; }
-}
-
-public sealed class OrderPayoutConfiguration
-{
-    [JsonPropertyName("destination")]
-    public OrderPayoutConfigurationDestination? Destination { get; set; }
-
-    [JsonPropertyName("enable_fx")]
-    public bool? EnableFx { get; set; }
-}
-
-public sealed class OrderPayoutConfigurationDestination
-{
-    [JsonPropertyName("financial_account_id")]
-    public string? FinancialAccountId { get; set; }
 }
 
 public sealed class OrderPayoutDestination
@@ -109,7 +81,7 @@ public sealed class OrderCreateRequest
     public string? Number { get; set; }
 
     [JsonPropertyName("line_items")]
-    public List<LineItem>? LineItems { get; set; }
+    public List<LineItemParams>? LineItems { get; set; }
 
     [JsonPropertyName("custom_data")]
     public Dictionary<string, string>? CustomData { get; set; }
@@ -145,7 +117,7 @@ public sealed class OrderUpdateRequest
     public bool? Finalize { get; set; }
 
     [JsonPropertyName("line_items")]
-    public List<LineItem>? LineItems { get; set; }
+    public List<LineItemParams>? LineItems { get; set; }
 
     [JsonPropertyName("number")]
     public string? Number { get; set; }
@@ -286,91 +258,7 @@ public sealed class OrderLineItemGroup
     public List<LineItem>? LineItems { get; set; }
 
     [JsonPropertyName("total")]
-    public Money? Total { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
-}
-
-public sealed class OrderPaymentAttempt
-{
-    [JsonPropertyName("payment_method_type")]
-    public string? PaymentMethodType { get; set; }
-
-    [JsonPropertyName("payment_method_id")]
-    public string? PaymentMethodId { get; set; }
-
-    [JsonPropertyName("reference")]
-    public string? Reference { get; set; }
-
-    [JsonPropertyName("status")]
-    public string? Status { get; set; }
-
-    [JsonPropertyName("initiated_at")]
-    public string? InitiatedAt { get; set; }
-
-    [JsonPropertyName("succeeded_at")]
-    public string? SucceededAt { get; set; }
-
-    [JsonPropertyName("failed_at")]
-    public string? FailedAt { get; set; }
-}
-
-public sealed class OrderPaymentNextAction
-{
-    [JsonPropertyName("type")]
-    public string? Type { get; set; }
-
-    [JsonPropertyName("confirm_payment")]
-    public JsonObject? ConfirmPayment { get; set; }
-
-    [JsonPropertyName("execute")]
-    public JsonObject? Execute { get; set; }
-
-    [JsonPropertyName("redirect")]
-    public JsonObject? Redirect { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
-}
-
-public sealed class OrderPayment
-{
-    [JsonPropertyName("id")]
-    public string? Id { get; set; }
-
-    [JsonPropertyName("status")]
-    public string? Status { get; set; }
-
-    [JsonPropertyName("statement_descriptor")]
-    public string? StatementDescriptor { get; set; }
-
-    [JsonPropertyName("amount")]
-    public Money? Amount { get; set; }
-
-    [JsonPropertyName("payment_method")]
-    public PaymentMethod? PaymentMethod { get; set; }
-
-    [JsonPropertyName("latest_attempt")]
-    public OrderPaymentAttempt? LatestAttempt { get; set; }
-
-    [JsonPropertyName("next_action")]
-    public OrderPaymentNextAction? NextAction { get; set; }
-
-    [JsonPropertyName("payout_configuration")]
-    public OrderPayoutConfiguration? PayoutConfiguration { get; set; }
-
-    [JsonPropertyName("initiated_at")]
-    public string? InitiatedAt { get; set; }
-
-    [JsonPropertyName("executed_at")]
-    public string? ExecutedAt { get; set; }
-
-    [JsonPropertyName("paid_at")]
-    public string? PaidAt { get; set; }
-
-    [JsonPropertyName("balance_transaction")]
-    public BalanceTransaction? BalanceTransaction { get; set; }
+    public Amount? Total { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Extra { get; set; }
@@ -424,7 +312,7 @@ public sealed class Order
     public OrderLineItemGroup? LineItemGroup { get; set; }
 
     [JsonPropertyName("payment")]
-    public OrderPayment? Payment { get; set; }
+    public Payment? Payment { get; set; }
 
     [JsonPropertyName("invoice")]
     public OrderInvoice? Invoice { get; set; }

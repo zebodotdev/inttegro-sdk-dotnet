@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Inttegro.Money;
 
 namespace Inttegro;
 
@@ -33,7 +34,7 @@ public sealed class CreateRefundLineItem
     public string? OrderLineItemId { get; set; }
 
     [JsonPropertyName("refund_amount")]
-    public Money? RefundAmount { get; set; }
+    public AmountParams? RefundAmount { get; set; }
 
     [JsonPropertyName("reason")]
     public RefundReason? Reason { get; set; }
@@ -99,10 +100,10 @@ public sealed class RefundLineItem
     public string? OrderLineItemId { get; set; }
 
     [JsonPropertyName("original_amount_paid")]
-    public Money? OriginalAmountPaid { get; set; }
+    public Amount? OriginalAmountPaid { get; set; }
 
     [JsonPropertyName("refund_amount")]
-    public Money? RefundAmount { get; set; }
+    public Amount? RefundAmount { get; set; }
 
     [JsonPropertyName("reason")]
     public RefundReason? Reason { get; set; }
@@ -123,7 +124,7 @@ public sealed class Refund
     public RefundStatus Status { get; set; }
 
     [JsonPropertyName("total")]
-    public Money? Total { get; set; }
+    public Amount? Total { get; set; }
 
     [JsonPropertyName("line_items")]
     public List<RefundLineItem>? LineItems { get; set; }

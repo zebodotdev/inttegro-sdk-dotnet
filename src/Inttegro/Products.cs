@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Inttegro.Money;
 
 namespace Inttegro;
 
@@ -12,24 +13,6 @@ public sealed class ProductCategory
 
     [JsonPropertyName("slug")]
     public string? Slug { get; set; }
-}
-
-public sealed class ProductPrice
-{
-    [JsonPropertyName("amount")]
-    public long? Amount { get; set; }
-
-    [JsonPropertyName("currency")]
-    public string? Currency { get; set; }
-}
-
-public sealed class ProductPriceAmount
-{
-    [JsonPropertyName("currency")]
-    public string? Currency { get; set; }
-
-    [JsonPropertyName("value")]
-    public long? Value { get; set; }
 }
 
 public sealed class ProductDefaultUnitPrice
@@ -47,7 +30,7 @@ public sealed class ProductDefaultUnitPrice
     public string? About { get; set; }
 
     [JsonPropertyName("nominal")]
-    public ProductPriceAmount? Nominal { get; set; }
+    public Amount? Nominal { get; set; }
 
     [JsonPropertyName("created_at")]
     public string? CreatedAt { get; set; }
@@ -68,7 +51,7 @@ public sealed class ProductPriceSummary
     public string? Label { get; set; }
 
     [JsonPropertyName("nominal")]
-    public ProductPriceAmount? Nominal { get; set; }
+    public Amount? Nominal { get; set; }
 }
 
 public sealed class ProductShipmentDimensions
@@ -130,9 +113,6 @@ public sealed class CreateProductRequest
     [JsonPropertyName("category")]
     public ProductCategory? Category { get; set; }
 
-    [JsonPropertyName("price")]
-    public ProductPrice? Price { get; set; }
-
     [JsonPropertyName("shipment")]
     public ProductShipment? Shipment { get; set; }
 
@@ -175,9 +155,6 @@ public sealed class UpdateProductRequest
     [JsonPropertyName("category")]
     public ProductCategory? Category { get; set; }
 
-    [JsonPropertyName("price")]
-    public ProductPrice? Price { get; set; }
-
     [JsonPropertyName("shipment")]
     public ProductShipment? Shipment { get; set; }
 
@@ -209,7 +186,7 @@ public sealed class AddProductPriceRequest
     public string? About { get; set; }
 
     [JsonPropertyName("amount")]
-    public ProductPriceAmount? Amount { get; set; }
+    public AmountParams? Amount { get; set; }
 
     [JsonPropertyName("set_as_default")]
     public bool? SetAsDefault { get; set; }
@@ -261,9 +238,6 @@ public sealed class Product
 
     [JsonPropertyName("category")]
     public ProductCategory? Category { get; set; }
-
-    [JsonPropertyName("price")]
-    public ProductPrice? Price { get; set; }
 
     [JsonPropertyName("default_unit_price")]
     public ProductDefaultUnitPrice? DefaultUnitPrice { get; set; }

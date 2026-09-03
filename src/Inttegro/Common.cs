@@ -2,6 +2,7 @@ using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Inttegro.Money;
 
 namespace Inttegro;
 
@@ -31,15 +32,6 @@ public enum LineItemType
     Fee,
     [EnumMember(Value = "shipping")]
     Shipping
-}
-
-public sealed class Money
-{
-    [JsonPropertyName("currency")]
-    public string? Currency { get; set; }
-
-    [JsonPropertyName("value")]
-    public long? Value { get; set; }
 }
 
 public sealed class RequestMeta
@@ -153,6 +145,21 @@ public sealed class CheckoutSettings
     public string? CancelUrl { get; set; }
 }
 
+public sealed class LineItemParams
+{
+    [JsonPropertyName("type")]
+    public LineItemType Type { get; set; }
+
+    [JsonPropertyName("product")]
+    public ProductDetailsParams? Product { get; set; }
+
+    [JsonPropertyName("fee")]
+    public FeeDetailsParams? Fee { get; set; }
+
+    [JsonPropertyName("shipping")]
+    public ShippingDetailsParams? Shipping { get; set; }
+}
+
 public sealed class LineItem
 {
     [JsonPropertyName("type")]
@@ -166,6 +173,39 @@ public sealed class LineItem
 
     [JsonPropertyName("shipping")]
     public ShippingDetails? Shipping { get; set; }
+}
+
+public sealed class ProductDetailsParams
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("type")]
+    public ProductType Type { get; set; }
+
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("about")]
+    public string? About { get; set; }
+
+    [JsonPropertyName("quantity")]
+    public long? Quantity { get; set; }
+
+    [JsonPropertyName("price")]
+    public PriceParams? Price { get; set; }
+
+    [JsonPropertyName("price_id")]
+    public string? PriceId { get; set; }
+
+    [JsonPropertyName("reference")]
+    public string? Reference { get; set; }
+
+    [JsonPropertyName("tax_code")]
+    public string? TaxCode { get; set; }
+
+    [JsonPropertyName("custom_data")]
+    public Dictionary<string, JsonNode?>? CustomData { get; set; }
 }
 
 public sealed class ProductDetails
@@ -186,7 +226,7 @@ public sealed class ProductDetails
     public long? Quantity { get; set; }
 
     [JsonPropertyName("price")]
-    public Money? Price { get; set; }
+    public Price? Price { get; set; }
 
     [JsonPropertyName("reference")]
     public string? Reference { get; set; }
@@ -196,6 +236,27 @@ public sealed class ProductDetails
 
     [JsonPropertyName("custom_data")]
     public Dictionary<string, JsonNode?>? CustomData { get; set; }
+}
+
+public sealed class FeeDetailsParams
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("label")]
+    public string? Label { get; set; }
+
+    [JsonPropertyName("tax_code")]
+    public string? TaxCode { get; set; }
+
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+
+    [JsonPropertyName("custom_data")]
+    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+
+    [JsonPropertyName("amount")]
+    public AmountParams? Amount { get; set; }
 }
 
 public sealed class FeeDetails
@@ -216,7 +277,22 @@ public sealed class FeeDetails
     public Dictionary<string, JsonNode?>? CustomData { get; set; }
 
     [JsonPropertyName("amount")]
-    public Money? Amount { get; set; }
+    public Amount? Amount { get; set; }
+}
+
+public sealed class ShippingDetailsParams
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("tax_code")]
+    public string? TaxCode { get; set; }
+
+    [JsonPropertyName("custom_data")]
+    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+
+    [JsonPropertyName("fee")]
+    public AmountParams? Fee { get; set; }
 }
 
 public sealed class ShippingDetails
@@ -231,5 +307,5 @@ public sealed class ShippingDetails
     public Dictionary<string, JsonNode?>? CustomData { get; set; }
 
     [JsonPropertyName("fee")]
-    public Money? Fee { get; set; }
+    public Amount? Fee { get; set; }
 }

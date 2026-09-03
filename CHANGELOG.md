@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [4.0.0] - 2026-09-03
+
+- Breaking: replaced order-prefixed payment models with semantic `Payment`, `PaymentAttempt`, `PaymentNextAction`, and payout-configuration types.
+- Added native payment enums with exact wire-value serialization and removed their duplicate `ApiEnums` constants.
+- Separated request and response amount, price, and order line-item types.
+
 ## [3.0.1] - 2026-09-03
 
 - Corrected the transport user agent and README to match the direct domain return API.

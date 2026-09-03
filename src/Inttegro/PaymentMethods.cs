@@ -5,11 +5,24 @@ using System.Text.Json.Serialization;
 
 namespace Inttegro;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(WireEnumJsonConverter<PaymentMethodType>))]
+public enum PaymentMethodType
+{
+    [EnumMember(Value = "mobile_money")]
+    MobileMoney,
+    [EnumMember(Value = "bank_account")]
+    BankAccount,
+    [EnumMember(Value = "card")]
+    Card,
+    [EnumMember(Value = "motito")]
+    Motito
+}
+
+[JsonConverter(typeof(WireEnumJsonConverter<MobileMoneyNetwork>))]
 public enum MobileMoneyNetwork
 {
     [EnumMember(Value = "mtn")]
-    Mtn,
+    MTN,
     [EnumMember(Value = "vodafone")]
     Vodafone,
     [EnumMember(Value = "airteltigo")]

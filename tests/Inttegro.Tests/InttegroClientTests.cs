@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Inttegro;
 using Inttegro.Errors;
+using Inttegro.Money;
 using System.Linq;
 using Xunit;
 
@@ -14,6 +15,28 @@ namespace Inttegro.Tests;
 public class InttegroClientTests
 {
     private static readonly Regex UuidV7Regex = new("^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", RegexOptions.IgnoreCase);
+
+    [Fact]
+    public void AmountAndNetworkConstantsSerializeToLowercaseWireValues()
+    {
+        var amountJson = JsonSerializer.Serialize(new AmountParams { Currency = Currency.GHS, Value = 3005 });
+        var priceJson = JsonSerializer.Serialize(new PriceParams { Currency = Currency.GHS, Value = 3005 });
+        var catalogPriceJson = JsonSerializer.Serialize(new CatalogPriceParams
+        {
+            Amount = new AmountParams { Currency = Currency.GHS, Value = 3005 },
+            Label = "Retail"
+        });
+        var networkJson = JsonSerializer.Serialize(MobileMoneyNetwork.MTN);
+        var paymentMethodJson = JsonSerializer.Serialize(PaymentMethodType.MobileMoney);
+        var paymentResultJson = JsonSerializer.Serialize(PaymentResultStatus.RequiresConfirmation);
+
+        Assert.Equal("{\"currency\":\"ghs\",\"value\":3005}", amountJson);
+        Assert.Equal("{\"currency\":\"ghs\",\"value\":3005}", priceJson);
+        Assert.Equal("{\"product_id\":null,\"label\":\"Retail\",\"about\":null,\"amount\":{\"currency\":\"ghs\",\"value\":3005}}", catalogPriceJson);
+        Assert.Equal("\"mtn\"", networkJson);
+        Assert.Equal("\"mobile_money\"", paymentMethodJson);
+        Assert.Equal("\"requires_confirmation\"", paymentResultJson);
+    }
 
     [Fact]
     public void BalanceTransactionsDeserializeSemanticSourcesAndOrderEmbedding()
@@ -40,6 +63,22 @@ public class InttegroClientTests
             """;
         var order = JsonSerializer.Deserialize<Order>(orderJson)!;
         Assert.Equal(BalanceTransactionType.Payment, order.Payment!.BalanceTransaction!.Type);
+    }
+
+    [Fact]
+    public void PaymentsDeserializeAsSemanticTypedObjects()
+    {
+        const string orderJson = """
+            {"id":"or_123","payment":{"id":"py_123","status":"requires_action","latest_attempt":{"status":"initiated"},"next_action":{"type":"confirm_payment","confirm_payment":{"request":{"sent_via":"sms"}}}}}
+            """;
+
+        var order = JsonSerializer.Deserialize<Order>(orderJson)!;
+
+        Assert.IsType<Payment>(order.Payment);
+        Assert.Equal(PaymentStatus.RequiresAction, order.Payment!.Status);
+        Assert.Equal(PaymentAttemptStatus.Initiated, order.Payment.LatestAttempt!.Status);
+        Assert.Equal(PaymentNextActionType.ConfirmPayment, order.Payment.NextAction!.Type);
+        Assert.Equal(PaymentConfirmationChannel.Sms, order.Payment.NextAction.ConfirmPayment!.Request!.SentVia);
     }
 
     [Fact]
@@ -70,7 +109,7 @@ public class InttegroClientTests
                 new CreateRefundLineItem
                 {
                     OrderLineItemId = "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-                    RefundAmount = new Money { Currency = "ghs", Value = 2500 },
+                    RefundAmount = new AmountParams { Currency = Currency.GHS, Value = 2500 },
                     Reason = RefundReason.ItemNotAsDescribed
                 }
             ],
@@ -351,7 +390,7 @@ public class InttegroClientTests
                 new CreateRefundLineItem
                 {
                     OrderLineItemId = "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-                    RefundAmount = new Money { Currency = "ghs", Value = 2500 },
+                    RefundAmount = new AmountParams { Currency = Currency.GHS, Value = 2500 },
                     Reason = RefundReason.ItemNotAsDescribed,
                     ReasonDetails = "Wrong size"
                 }

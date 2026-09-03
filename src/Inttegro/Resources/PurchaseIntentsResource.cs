@@ -11,6 +11,9 @@ public class PurchaseIntentsResource
     public Task<PurchaseIntent> CreateAsync(object payload, CancellationToken cancellationToken = default) =>
         _client.PostResourceAsync<PurchaseIntent>("/purchase_intents/create", "purchase_intent", payload, cancellationToken);
 
+    public Task<PurchaseIntent> CreateAsync(CreatePurchaseIntentParams payload, CancellationToken cancellationToken = default) =>
+        _client.PostResourceAsync<PurchaseIntent>("/purchase_intents/create", "purchase_intent", payload, cancellationToken);
+
     public Task<PurchaseIntent> LookupAsync(string id, CancellationToken cancellationToken = default) =>
         _client.PostResourceAsync<PurchaseIntent>("/purchase_intents/lookup", "purchase_intent", new { id }, cancellationToken);
 

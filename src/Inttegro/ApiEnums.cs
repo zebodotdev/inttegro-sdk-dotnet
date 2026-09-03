@@ -24,11 +24,6 @@ public static class ApiEnums
     public static class UploadReviewDecision { public const string Approved = "approved", Rejected = "rejected"; }
     public static class UploadReviewType { public const string Automatic = "automatic", Manual = "manual"; }
 
-    public static class PaymentNextActionType { public const string ConfirmPayment = "confirm_payment", Execute = "execute", Redirect = "redirect", Authorize = "authorize", None = "none"; }
-    public static class PaymentConfirmationChannel { public const string Sms = "sms", Email = "email", Push = "push"; }
-    public static class PaymentMethodType { public const string MobileMoney = "mobile_money", BankAccount = "bank_account", Card = "card", Motito = "motito"; }
-    public static class MobileMoneyNetwork { public const string Airtel = "airtel", Mtn = "mtn", Telecel = "telecel", Vodafone = "vodafone"; }
-
     public static class ProductType { public const string Physical = "physical", Digital = "digital", Service = "service", Voucher = "voucher", Custom = "custom", Cause = "cause"; }
     public static class ProductShipmentType { public const string Delivery = "delivery", Download = "download", Render = "render", Service = "service", Stream = "stream"; }
     public static class ProductShipmentInputType { public const string Delivery = "delivery", Download = "download", Render = "render", Stream = "stream"; }
@@ -50,10 +45,6 @@ public static class ApiEnums
     public static class DeliveryChannel { public const string Email = "email", Sms = "sms"; }
     public static class CheckoutOrderStatus { public const string Preparing = "preparing", RequiresPayment = "requires_payment", Completed = "completed", Canceled = "canceled", Expired = "expired"; }
     public static class OrderStatus { public const string Preparing = "preparing", RequiresPayment = "requires_payment", Paid = "paid", Completed = "completed", Canceled = "canceled", Expired = "expired", Unknown = "unknown"; }
-    public static class OrderPaymentStatus { public const string Initiated = "initiated", RequiresAction = "requires_action", Overdue = "overdue", Executed = "executed", Paid = "paid", Canceled = "canceled", Expired = "expired", Failed = "failed", Unknown = "unknown"; }
-    public static class PaymentAttemptStatus { public const string Initiated = "initiated", Executed = "executed", Succeeded = "succeeded", Canceled = "canceled", Expired = "expired", Failed = "failed", Unknown = "unknown"; }
-    public static class CheckoutPaymentStatus { public const string RequiresAction = "requires_action", Processing = "processing", Succeeded = "succeeded", Failed = "failed", Cancelled = "cancelled"; }
-    public static class PaymentResultStatus { public const string Pending = "pending", RequiresConfirmation = "requires_confirmation", Processing = "processing", Succeeded = "succeeded", Failed = "failed"; }
     public static class OrderCreatedFromResourceType { public const string PurchaseIntent = "purchase_intent"; }
 
     public static class RefundReason { public const string RequestedByCustomer = "requested_by_customer", Duplicate = "duplicate", Fraudulent = "fraudulent", OrderCanceled = "order_canceled", ItemReturned = "item_returned", ItemDamaged = "item_damaged", ItemNotReceived = "item_not_received", ItemNotAsDescribed = "item_not_as_described", Custom = "custom"; }

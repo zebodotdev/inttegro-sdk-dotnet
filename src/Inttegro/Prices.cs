@@ -1,8 +1,9 @@
 using System.Text.Json.Serialization;
+using Inttegro.Money;
 
 namespace Inttegro;
 
-public sealed class CreatePriceRequest
+public sealed class CatalogPriceParams
 {
     [JsonPropertyName("product_id")]
     public string? ProductId { get; set; }
@@ -13,12 +14,13 @@ public sealed class CreatePriceRequest
     [JsonPropertyName("about")]
     public string? About { get; set; }
 
-    [JsonPropertyName("currency")]
-    public string? Currency { get; set; }
-
     [JsonPropertyName("amount")]
-    public long? Amount { get; set; }
+    public AmountParams? Amount { get; set; }
 }
+
+public sealed class PriceParams : AmountParams { }
+
+public sealed class Price : Amount { }
 
 public sealed class LookupPriceRequest
 {
@@ -53,25 +55,10 @@ public sealed class PricePageRequest
     public string? ProductId { get; set; }
 }
 
-public sealed class PriceNominal
-{
-    [JsonPropertyName("currency")]
-    public string? Currency { get; set; }
-
-    [JsonPropertyName("value")]
-    public long? Value { get; set; }
-
-    [JsonPropertyName("sign")]
-    public int? Sign { get; set; }
-}
-
-public sealed class Price
+public sealed class CatalogPrice
 {
     [JsonPropertyName("id")]
     public string? Id { get; set; }
-
-    [JsonPropertyName("product_id")]
-    public string? ProductId { get; set; }
 
     [JsonPropertyName("label")]
     public string? Label { get; set; }
@@ -79,8 +66,14 @@ public sealed class Price
     [JsonPropertyName("about")]
     public string? About { get; set; }
 
+    [JsonPropertyName("active")]
+    public bool Active { get; set; }
+
     [JsonPropertyName("nominal")]
-    public PriceNominal? Nominal { get; set; }
+    public Amount? Nominal { get; set; }
+
+    [JsonPropertyName("product")]
+    public Product? Product { get; set; }
 
     [JsonPropertyName("created_at")]
     public string? CreatedAt { get; set; }
@@ -101,5 +94,5 @@ public sealed class PricePage
     public int? Size { get; set; }
 
     [JsonPropertyName("prices")]
-    public List<Price>? Prices { get; set; }
+    public List<CatalogPrice>? Prices { get; set; }
 }

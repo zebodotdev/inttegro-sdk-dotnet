@@ -350,13 +350,13 @@ public sealed class PurchaseIntent
     [JsonPropertyName("application_id")] public string? ApplicationId { get; set; }
     [JsonPropertyName("product_id")] public string? ProductId { get; set; }
     [JsonPropertyName("price_id")] public string? PriceId { get; set; }
-    [JsonPropertyName("quantity")] public JsonObject? Quantity { get; set; }
+    [JsonPropertyName("quantity")] public PurchaseIntentQuantity? Quantity { get; set; }
     [JsonPropertyName("status")] public string? Status { get; set; }
     [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
     [JsonPropertyName("updated_at")] public string? UpdatedAt { get; set; }
     [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
     [JsonPropertyName("product")] public Product? Product { get; set; }
-    [JsonPropertyName("price")] public Price? Price { get; set; }
+    [JsonPropertyName("price")] public PurchaseIntentPrice? Price { get; set; }
     [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Inttegro.Money;
 
 namespace Inttegro;
 
@@ -109,10 +110,10 @@ public sealed class Payout
     public string? DestinationId { get; set; }
 
     [JsonPropertyName("amount")]
-    public Money? Amount { get; set; }
+    public Amount? Amount { get; set; }
 
     [JsonPropertyName("max_amount")]
-    public Money? MaxAmount { get; set; }
+    public Amount? MaxAmount { get; set; }
 
     [JsonPropertyName("status")]
     public string? Status { get; set; }

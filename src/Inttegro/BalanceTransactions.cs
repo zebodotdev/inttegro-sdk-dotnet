@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using Inttegro.Money;
 
 namespace Inttegro;
 
@@ -38,7 +39,7 @@ public class BalanceTransaction
     public string OrderId { get; set; } = string.Empty;
 
     [JsonPropertyName("amount")]
-    public Money Amount { get; set; } = new();
+    public Amount Amount { get; set; } = new();
 
     [JsonPropertyName("created_at")]
     public string CreatedAt { get; set; } = string.Empty;
@@ -54,7 +55,7 @@ public class BalanceTransaction
 
     [Obsolete("The reviewed API does not return payout_configuration on balance transactions.")]
     [JsonPropertyName("payout_configuration")]
-    public OrderPayoutConfiguration? PayoutConfiguration { get; set; }
+    public PayoutConfiguration? PayoutConfiguration { get; set; }
 
     [JsonIgnore]
     public string? SourceId => Type switch
