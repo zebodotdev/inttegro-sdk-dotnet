@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Inttegro.Http;
 using Inttegro.Resources;
 
@@ -5,6 +6,10 @@ namespace Inttegro;
 
 public class InttegroClient : IDisposable
 {
+    public const string Version = "6.1.0";
+    public const string ActivitySourceName = "Inttegro";
+    public static readonly ActivitySource ActivitySource = new(ActivitySourceName, Version);
+
     private readonly ApiClient _apiClient;
     private bool _disposed;
 
@@ -36,13 +41,14 @@ public class InttegroClient : IDisposable
         string apiKey,
         string? baseUrl = null,
         TimeSpan? timeout = null,
-        HttpClient? httpClient = null
+        HttpClient? httpClient = null,
+        bool telemetryEnabled = true
     )
     {
         var resolvedBaseUrl = string.IsNullOrWhiteSpace(baseUrl) ? "https://api.inttegro.com" : baseUrl!;
         var resolvedTimeout = timeout ?? TimeSpan.FromSeconds(30);
 
-        _apiClient = new ApiClient(apiKey, resolvedBaseUrl, resolvedTimeout, httpClient);
+        _apiClient = new ApiClient(apiKey, resolvedBaseUrl, resolvedTimeout, httpClient, telemetryEnabled);
 
         Orders = new OrdersResource(_apiClient);
         Refunds = new RefundsResource(_apiClient);

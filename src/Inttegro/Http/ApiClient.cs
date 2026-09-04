@@ -13,8 +13,9 @@ internal class ApiClient : IDisposable
     private readonly HttpClient _httpClient;
     private readonly bool _ownsHttpClient;
     private readonly JsonSerializerOptions _serializerOptions;
+    private readonly Telemetry _telemetry;
 
-    public ApiClient(string apiKey, string baseUrl, TimeSpan timeout, HttpClient? httpClient = null)
+    public ApiClient(string apiKey, string baseUrl, TimeSpan timeout, HttpClient? httpClient = null, bool telemetryEnabled = true)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
         {
@@ -39,8 +40,9 @@ internal class ApiClient : IDisposable
         }
 
         _httpClient.BaseAddress = new Uri(baseUrl.TrimEnd('/'));
+        _telemetry = new Telemetry(_httpClient.BaseAddress, telemetryEnabled);
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("inttegro-sdk-dotnet/3.0.1");
+        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd($"inttegro-sdk-dotnet/{InttegroClient.Version}");
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
@@ -48,31 +50,11 @@ internal class ApiClient : IDisposable
     {
         var requestUri = path.StartsWith('/') ? path : "/" + path;
         var json = SerializeRequestPayload(requestUri, payload, generateIdempotencyKey: true);
-        using var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        HttpResponseMessage response;
-        try
+        using var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
         {
-            response = await _httpClient.PostAsync(requestUri, content, cancellationToken);
-        }
-        catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
-        {
-            throw new InttegroTimeoutException("Request timed out", ex);
-        }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
-        {
-            throw new InttegroNetworkException("Network request failed", ex);
-        }
-
-        var body = await response.Content.ReadAsStringAsync(cancellationToken);
-        var parsed = ParseJson(body);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            HandleError(response, body, parsed);
-        }
-
-        return new WireEnvelope(parsed);
+            Content = new StringContent(json, Encoding.UTF8, "application/json")
+        };
+        return await SendForJsonAsync(request, cancellationToken);
     }
 
     public async Task<T> PostAsync<T>(string path, object? payload = null, CancellationToken cancellationToken = default)
@@ -176,7 +158,11 @@ internal class ApiClient : IDisposable
         {
             request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
-        return await SendForJsonAsync(request, cancellationToken);
+        return await SendForJsonAsync(
+            request,
+            cancellationToken,
+            IsAbsoluteUrl(pathOrUrl) ? "upload_requests.upload" : null
+        );
     }
 
     internal async Task<T> PostMultipartAsync<T>(
@@ -221,7 +207,7 @@ internal class ApiClient : IDisposable
     public async Task<FileDownload> GetBinaryPublicAsync(string url, CancellationToken cancellationToken = default)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        return await SendForDownloadAsync(request, cancellationToken);
+        return await SendForDownloadAsync(request, cancellationToken, "file_links.download");
     }
 
     private Uri RequestUri(string pathOrUrl)
@@ -307,8 +293,15 @@ internal class ApiClient : IDisposable
         return $"{hex[..8]}-{hex[8..12]}-{hex[12..16]}-{hex[16..20]}-{hex[20..]}";
     }
 
-    private async Task<WireEnvelope> SendForJsonAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    private async Task<WireEnvelope> SendForJsonAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken,
+        string? explicitOperation = null
+    )
     {
+        using var telemetryRequest = _telemetry.Start(request.Method, request.RequestUri, explicitOperation);
+        telemetryRequest.Inject(request);
+        telemetryRequest.Attempt();
         HttpResponseMessage response;
         try
         {
@@ -316,31 +309,60 @@ internal class ApiClient : IDisposable
         }
         catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
         {
+            telemetryRequest.Fail("timeout");
             throw new InttegroTimeoutException("Request timed out", ex);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
+            telemetryRequest.Fail(cancellationToken.IsCancellationRequested ? "canceled" : "transport_error");
             throw new InttegroNetworkException("Network request failed", ex);
         }
 
+        telemetryRequest.Response(response);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         var parsed = ParseJson(body);
         if (!response.IsSuccessStatusCode)
         {
+            telemetryRequest.Fail($"http_{(int)response.StatusCode}");
             HandleError(response, body, parsed);
         }
+        telemetryRequest.Decoded();
         return new WireEnvelope(parsed);
     }
 
-    private async Task<FileDownload> SendForDownloadAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    private async Task<FileDownload> SendForDownloadAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken,
+        string? explicitOperation = null
+    )
     {
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        using var telemetryRequest = _telemetry.Start(request.Method, request.RequestUri, explicitOperation);
+        telemetryRequest.Inject(request);
+        telemetryRequest.Attempt();
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.SendAsync(request, cancellationToken);
+        }
+        catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            telemetryRequest.Fail("timeout");
+            throw new InttegroTimeoutException("Request timed out", ex);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            telemetryRequest.Fail(cancellationToken.IsCancellationRequested ? "canceled" : "transport_error");
+            throw new InttegroNetworkException("Network request failed", ex);
+        }
+        telemetryRequest.Response(response);
         var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
+            telemetryRequest.Fail($"http_{(int)response.StatusCode}");
             var body = Encoding.UTF8.GetString(bytes);
             HandleError(response, body, ParseJson(body));
         }
+        telemetryRequest.Decoded();
         return new FileDownload(bytes, response.Content.Headers.ContentType?.MediaType);
     }
 

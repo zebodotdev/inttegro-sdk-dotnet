@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using System.Reflection;
 using Inttegro;
 using Inttegro.Errors;
 using Inttegro.Money;
@@ -470,12 +472,113 @@ public class InttegroClientTests
         Assert.Matches(UuidV7Regex, key!);
     }
 
+    [Fact]
+    public async Task TelemetryTracesLogicalOperationPropagatesAndRedactsRequestData()
+    {
+        var activities = new List<Activity>();
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == InttegroClient.ActivitySourceName,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStopped = activities.Add
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        var handler = new RecordingHandler { RequestId = "req_telemetry" };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
+        using var client = new InttegroClient("sk_test_do_not_trace", httpClient: httpClient);
+
+        await client.Orders.LookupAsync("or_private_123");
+
+        var activity = Assert.Single(activities);
+        Assert.Equal("inttegro.orders.lookup", activity.DisplayName);
+        Assert.Equal("orders.lookup", activity.GetTagItem("inttegro.operation.name"));
+        Assert.Equal(200, activity.GetTagItem("http.response.status_code"));
+        Assert.Equal("req_telemetry", activity.GetTagItem("inttegro.request.id"));
+        Assert.Contains(activity.Events, item => item.Name == "inttegro.request.prepared");
+        Assert.Contains(activity.Events, item => item.Name == "inttegro.http.attempt.started");
+        Assert.Contains(activity.Events, item => item.Name == "inttegro.response.received");
+        Assert.Contains(activity.Events, item => item.Name == "inttegro.response.decoded");
+
+        var request = Assert.Single(handler.Requests);
+        Assert.True(request.Headers.Contains("traceparent"));
+        var telemetryText = string.Join(" ", activity.TagObjects.Select(tag => $"{tag.Key}={tag.Value}"))
+            + string.Join(" ", activity.Events.Select(item => item.Name));
+        Assert.DoesNotContain("sk_test_do_not_trace", telemetryText);
+        Assert.DoesNotContain("or_private_123", telemetryText);
+    }
+
+    [Fact]
+    public void TelemetryDoesNotNameUnknownRoutesFromResourceIds()
+    {
+        var activities = new List<Activity>();
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == InttegroClient.ActivitySourceName,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStopped = activities.Add
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        var telemetryType = typeof(InttegroClient).Assembly.GetType("Inttegro.Http.Telemetry")!;
+        var telemetry = Activator.CreateInstance(
+            telemetryType,
+            BindingFlags.Instance | BindingFlags.NonPublic,
+            binder: null,
+            args: new object[] { new Uri("https://api.inttegro.com"), true },
+            culture: null
+        )!;
+        var start = telemetryType.GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        using ((IDisposable)start.Invoke(
+            telemetry,
+            new object?[] { HttpMethod.Get, new Uri("/orders/or_private_123", UriKind.Relative), null }
+        )!) { }
+
+        var activity = Assert.Single(activities);
+        Assert.Equal("inttegro.http.request", activity.DisplayName);
+        Assert.Null(activity.GetTagItem("url.template"));
+        Assert.DoesNotContain("or_private_123", string.Join(" ", activity.TagObjects));
+    }
+
+    [Fact]
+    public async Task TelemetryRecordsSafeHttpFailure()
+    {
+        var activities = new List<Activity>();
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == InttegroClient.ActivitySourceName,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStopped = activities.Add
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        var handler = new RecordingHandler
+        {
+            StatusCode = HttpStatusCode.Unauthorized,
+            ResponseBody = "{\"message\":\"sk_live_private must never be traced\"}"
+        };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
+        using var client = new InttegroClient("sk_live_private", httpClient: httpClient);
+
+        await Assert.ThrowsAsync<InttegroAuthenticationException>(() => client.Orders.LookupAsync("or_private"));
+
+        var activity = Assert.Single(activities);
+        Assert.Equal(ActivityStatusCode.Error, activity.Status);
+        Assert.Equal("http_401", activity.GetTagItem("error.type"));
+        Assert.Contains(activity.Events, item => item.Name == "inttegro.request.failed");
+        var telemetryText = string.Join(" ", activity.TagObjects.Select(tag => $"{tag.Key}={tag.Value}"))
+            + string.Join(" ", activity.Events.Select(item => item.Name));
+        Assert.DoesNotContain("sk_live_private", telemetryText);
+        Assert.DoesNotContain("or_private", telemetryText);
+    }
+
     private class RecordingHandler : HttpMessageHandler
     {
         public List<HttpRequestMessage> Requests { get; } = new();
         public List<string> Bodies { get; } = new();
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
         public string? ResponseBody { get; set; }
+        public string? RequestId { get; set; }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -487,6 +590,10 @@ public class InttegroClientTests
                 Content = new StringContent(responseBody, Encoding.UTF8, "application/json")
             };
             response.Headers.Date = DateTimeOffset.UtcNow;
+            if (!string.IsNullOrWhiteSpace(RequestId))
+            {
+                response.Headers.TryAddWithoutValidation("x-request-id", RequestId);
+            }
             return response;
         }
 

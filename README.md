@@ -111,6 +111,19 @@ Console.WriteLine($"{refund.Id} {refund.Status} {refund.Total?.Value}");
 
 Use `Refunds.CancelAsync`, `Refunds.LookupAsync`, and `Refunds.PageAsync` to manage the refund lifecycle. `Orders.RefundAsync` remains a compatibility alias and returns the created `Refund` directly.
 
+## Observe SDK operations
+
+The SDK emits vendor-neutral `ActivitySource` spans and never configures an exporter or sends telemetry by itself. Register its source in your application's OpenTelemetry setup:
+
+```csharp
+services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddSource(InttegroClient.ActivitySourceName)
+        .AddOtlpExporter());
+```
+
+Spans are named after logical operations such as `inttegro.orders.create`. HTTP attempts, response receipt, and decoding are span events. API keys, bodies, resource IDs, dynamic URLs, and exception messages are never recorded. See [SDK observability](https://studio.inttegro.com/sdk-observability) for the complete contract and pass `telemetryEnabled: false` when needed.
+
 ## Work with the API
 
 The SDK covers orders and checkout, customers, products and prices, purchase intents, payment methods, balances, payouts and refunds, notifications, files, application settings, keys, and country specifications. Resources use .NET properties such as `PurchaseIntents` and `PaymentMethods`.
@@ -131,7 +144,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify Inttegro.6.0.0.nupkg \
+gh attestation verify Inttegro.6.1.0.nupkg \
   --repo zebodotdev/inttegro-sdk-dotnet
 ```
 

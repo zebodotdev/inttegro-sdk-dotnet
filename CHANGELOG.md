@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [6.1.0] - 2026-09-04
+
+- Added vendor-neutral `ActivitySource` spans for logical SDK operations, HTTP attempts, response receipt, decoding, and safe failure categories.
+- Added W3C trace-context propagation and per-client telemetry disabling without a runtime package dependency.
+- Kept request bodies, credentials, resource identifiers, dynamic URLs, and exception details out of telemetry.
+
 ## [6.0.0] - 2026-09-03
 
 - Breaking: moved wallet types into the `Inttegro.Wallets` namespace.
