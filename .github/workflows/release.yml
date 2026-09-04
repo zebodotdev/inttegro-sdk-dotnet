@@ -54,7 +54,7 @@ jobs:
 
       - name: Restore and test
         run: |
-          dotnet restore tests/Inttegro.Tests/Inttegro.Tests.csproj
+          dotnet restore tests/Inttegro.Tests/Inttegro.Tests.csproj --locked-mode
           dotnet test tests/Inttegro.Tests/Inttegro.Tests.csproj --configuration Release --no-restore
 
       - name: Pack the exact release artifacts
@@ -86,7 +86,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cp "${{ steps.attest.outputs.bundle-path }}" artifacts/ATTESTATION.sigstore.jsonl
+          cp "${{ steps.attest.outputs.bundle-path }}" artifacts/ATTESTATIONS.sigstore
           {
             echo "repository=https://github.com/${GITHUB_REPOSITORY}"
             echo "tag=${GITHUB_REF_NAME}"
@@ -95,7 +95,7 @@ jobs:
           } > artifacts/PROVENANCE.txt
           (
             cd artifacts
-            sha256sum ./*.nupkg ./*.snupkg ./ATTESTATION.sigstore.jsonl ./PACKAGE-CONTENTS.txt ./PROVENANCE.txt > SHA256SUMS
+            sha256sum ./*.nupkg ./*.snupkg ./ATTESTATIONS.sigstore ./PACKAGE-CONTENTS.txt ./PROVENANCE.txt > SHA256SUMS
           )
 
       - name: Create the draft GitHub release
