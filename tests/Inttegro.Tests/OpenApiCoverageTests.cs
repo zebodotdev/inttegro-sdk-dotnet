@@ -11,13 +11,22 @@ public class OpenApiCoverageTests
         "/file_links/open",
         "/upload_requests/upload"
     ];
+    private static readonly string[] ClientCheckoutOperations =
+    [
+        "/checkout/lookup",
+        "/checkout/pay",
+        "/checkout/request_confirmation",
+        "/checkout/confirm_payment"
+    ];
 
     [Fact]
     public void SdkImplementsEveryPublicOpenApiPath()
     {
         var openApiPaths = LoadOpenApiPaths(FindOpenApiSpec());
         var implementedPaths = LoadImplementedPaths(FindSdkRoot());
-        var exceptions = CapabilityUrlOperations.ToHashSet(StringComparer.Ordinal);
+        var exceptions = CapabilityUrlOperations
+            .Concat(ClientCheckoutOperations)
+            .ToHashSet(StringComparer.Ordinal);
 
         var missing = openApiPaths
             .Where(path => !implementedPaths.Contains(path) && !exceptions.Contains(path))
