@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [6.2.0] - 2026-09-06
+
+- Added opt-in, typed error reporting to application-owned collectors with privacy-safe payloads, stable fingerprints, isolated reporter failures, and no reporting work when unconfigured.
+
 ## [6.1.0] - 2026-09-04
 
 - Added vendor-neutral `ActivitySource` spans for logical SDK operations, HTTP attempts, response receipt, decoding, and safe failure categories.

@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Reflection;
 using Inttegro;
 using Inttegro.Errors;
+using Inttegro.Diagnostics;
 using Inttegro.Money;
 using System.Linq;
 using Xunit;
@@ -570,6 +571,75 @@ public class InttegroClientTests
             + string.Join(" ", activity.Events.Select(item => item.Name));
         Assert.DoesNotContain("sk_live_private", telemetryText);
         Assert.DoesNotContain("or_private", telemetryText);
+    }
+
+    [Fact]
+    public async Task ErrorReportingReportsOnePrivacySafeFinalFailureWhenConfigured()
+    {
+        var reports = new List<ErrorReport>();
+        var handler = new RecordingHandler
+        {
+            StatusCode = HttpStatusCode.ServiceUnavailable,
+            RequestId = "req_456",
+            ResponseBody = "{\"error\":{\"type\":\"transient_error\",\"code\":\"provider_failed\",\"fix_code\":\"repeat_same_request\",\"message\":\"private provider detail\"}}"
+        };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
+        using var client = new InttegroClient(
+            "sk_live_must_not_appear",
+            httpClient: httpClient,
+            telemetryEnabled: false,
+            errorReporter: report =>
+            {
+                reports.Add(report);
+                throw new InvalidOperationException("collector unavailable");
+            }
+        );
+
+        var exception = await Assert.ThrowsAsync<InttegroApiException>(
+            () => client.Orders.LookupAsync("or_private")
+        );
+
+        var report = Assert.Single(reports);
+        Assert.Equal("http_503", report.Category);
+        Assert.Equal("orders.lookup", report.Operation);
+        Assert.Equal("POST", report.Http.Method);
+        Assert.Equal("/orders/lookup", report.Http.Route);
+        Assert.Equal(503, report.Http.StatusCode);
+        Assert.Equal("req_456", report.Http.RequestId);
+        Assert.Equal("transient_error", report.ApiError?.Type);
+        Assert.Equal("inttegro:dotnet:orders.lookup:http_503:503", report.Fingerprint);
+        Assert.Same(report, exception.Report);
+        var encoded = JsonSerializer.Serialize(report);
+        Assert.Contains("\"schemaVersion\":1", encoded);
+        Assert.Contains("\"serverAddress\":\"api.inttegro.com\"", encoded);
+        Assert.DoesNotContain("private provider detail", encoded);
+        Assert.DoesNotContain("sk_live_must_not_appear", encoded);
+        Assert.DoesNotContain("or_private", encoded);
+    }
+
+    [Fact]
+    public async Task DefaultErrorReportingSkipsExpectedApiErrors()
+    {
+        var reports = new List<ErrorReport>();
+        var handler = new RecordingHandler
+        {
+            StatusCode = HttpStatusCode.BadRequest,
+            ResponseBody = "{\"error\":{\"type\":\"invalid_request_parameter\"}}"
+        };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
+        using var client = new InttegroClient(
+            "test",
+            httpClient: httpClient,
+            telemetryEnabled: false,
+            errorReporter: reports.Add
+        );
+
+        var exception = await Assert.ThrowsAsync<InttegroApiException>(
+            () => client.Orders.LookupAsync("or_private")
+        );
+
+        Assert.Empty(reports);
+        Assert.Null(exception.Report);
     }
 
     private class RecordingHandler : HttpMessageHandler

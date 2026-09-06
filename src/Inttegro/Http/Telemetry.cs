@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Inttegro.Diagnostics;
+using Inttegro.Errors;
 
 namespace Inttegro.Http;
 
@@ -24,16 +26,30 @@ internal sealed class Telemetry
     };
     private readonly Uri _baseUri;
     private readonly bool _enabled;
+    private readonly ErrorReporter? _errorReporter;
+    private readonly ErrorReportingPolicy _errorReportingPolicy;
 
     internal Telemetry(Uri baseUri, bool enabled)
+        : this(baseUri, enabled, null, ErrorReportingPolicy.Unexpected)
+    {
+    }
+
+    internal Telemetry(
+        Uri baseUri,
+        bool enabled,
+        ErrorReporter? errorReporter,
+        ErrorReportingPolicy errorReportingPolicy
+    )
     {
         _baseUri = baseUri;
         _enabled = enabled;
+        _errorReporter = errorReporter;
+        _errorReportingPolicy = errorReportingPolicy;
     }
 
     internal Request Start(HttpMethod method, Uri? requestUri, string? explicitOperation = null)
     {
-        if (!_enabled || requestUri == null)
+        if (requestUri == null || (!_enabled && _errorReporter == null))
         {
             return new Request(null);
         }
@@ -44,26 +60,38 @@ internal sealed class Telemetry
             ? (route == null ? "http.request" : OperationFromRoute(route))
             : explicitOperation;
         var serverAddress = isRelativePath ? _baseUri.Host : requestUri.Host;
-        var activity = InttegroClient.ActivitySource.StartActivity(
-            $"inttegro.{operation}",
-            ActivityKind.Client
-        );
-        if (activity == null)
+        Activity? activity = null;
+        if (_enabled)
         {
-            return new Request(null);
+            activity = InttegroClient.ActivitySource.StartActivity(
+                $"inttegro.{operation}",
+                ActivityKind.Client
+            );
         }
-
-        activity.SetTag("inttegro.operation.name", operation);
-        activity.SetTag("inttegro.sdk.language", "dotnet");
-        activity.SetTag("inttegro.sdk.version", InttegroClient.Version);
-        activity.SetTag("http.request.method", method.Method.ToUpperInvariant());
-        activity.SetTag("server.address", serverAddress);
-        if (route != null)
+        if (activity != null)
         {
-            activity.SetTag("url.template", route);
+            activity.SetTag("inttegro.operation.name", operation);
+            activity.SetTag("inttegro.sdk.language", "dotnet");
+            activity.SetTag("inttegro.sdk.version", InttegroClient.Version);
+            activity.SetTag("http.request.method", method.Method.ToUpperInvariant());
+            activity.SetTag("server.address", serverAddress);
+            if (route != null)
+            {
+                activity.SetTag("url.template", route);
+            }
+            activity.AddEvent(new ActivityEvent("inttegro.request.prepared"));
         }
-        activity.AddEvent(new ActivityEvent("inttegro.request.prepared"));
-        return new Request(activity);
+        return _errorReporter == null
+            ? new Request(activity)
+            : new Request(
+                activity,
+                _errorReporter,
+                _errorReportingPolicy,
+                operation,
+                route,
+                serverAddress,
+                method.Method
+            );
     }
 
     private static string OperationFromRoute(string route)
@@ -92,10 +120,37 @@ internal sealed class Telemetry
     internal sealed class Request : IDisposable
     {
         private readonly Activity? _activity;
+        private readonly ErrorReporter? _errorReporter;
+        private readonly ErrorReportingPolicy _errorReportingPolicy;
+        private readonly string? _operation;
+        private readonly string? _route;
+        private readonly string? _serverAddress;
+        private readonly string? _method;
+        private readonly long _startedAt;
 
         internal Request(Activity? activity)
+            : this(activity, null, ErrorReportingPolicy.Unexpected, null, null, null, null)
+        {
+        }
+
+        internal Request(
+            Activity? activity,
+            ErrorReporter? errorReporter,
+            ErrorReportingPolicy errorReportingPolicy,
+            string? operation,
+            string? route,
+            string? serverAddress,
+            string? method
+        )
         {
             _activity = activity;
+            _errorReporter = errorReporter;
+            _errorReportingPolicy = errorReportingPolicy;
+            _operation = operation;
+            _route = route;
+            _serverAddress = serverAddress;
+            _method = method;
+            _startedAt = errorReporter == null ? 0 : Stopwatch.GetTimestamp();
         }
 
         internal void Inject(HttpRequestMessage request)
@@ -157,6 +212,74 @@ internal sealed class Telemetry
                 "inttegro.request.failed",
                 tags: new ActivityTagsCollection { ["error.type"] = errorType }
             ));
+        }
+
+        internal void Fail(Exception error, string errorType)
+        {
+            Fail(errorType);
+            var reporter = _errorReporter;
+            if (reporter == null || errorType == "canceled")
+            {
+                return;
+            }
+            try
+            {
+                var apiException = error as InttegroApiException;
+                if (_errorReportingPolicy == ErrorReportingPolicy.Unexpected
+                    && apiException != null
+                    && apiException.StatusCode < 500
+                    && apiException.Type != "unknown_error")
+                {
+                    return;
+                }
+
+                var statusCode = apiException?.StatusCode;
+                var apiContext = apiException != null
+                    && (apiException.Type != null || apiException.Code != null || apiException.FixCode != null)
+                    ? new ApiErrorReportContext(apiException.Type, apiException.Code, apiException.FixCode)
+                    : null;
+                var traceContext = _activity != null && _activity.Context != default
+                    ? new TraceReportContext(_activity.TraceId.ToHexString(), _activity.SpanId.ToHexString())
+                    : null;
+                var duration = Stopwatch.GetElapsedTime(_startedAt);
+                var report = new ErrorReport(
+                    1,
+                    Guid.NewGuid().ToString(),
+                    DateTimeOffset.UtcNow,
+                    "error",
+                    errorType,
+                    _operation ?? "http.request",
+                    new SdkReportContext("dotnet", InttegroClient.Version),
+                    new HttpReportContext(
+                        _method?.ToUpperInvariant() ?? "UNKNOWN",
+                        _route,
+                        _serverAddress ?? "unknown",
+                        statusCode,
+                        apiException?.RequestId,
+                        Math.Max(0, (long)duration.TotalMilliseconds)
+                    ),
+                    apiContext,
+                    traceContext,
+                    error.GetType().Name,
+                    string.Join(":", new[]
+                    {
+                        "inttegro",
+                        "dotnet",
+                        _operation ?? "http.request",
+                        errorType,
+                        statusCode?.ToString() ?? "none"
+                    })
+                );
+                if (error is InttegroException inttegroException)
+                {
+                    inttegroException.Report = report;
+                }
+                reporter(report);
+            }
+            catch
+            {
+                // Report preparation and delivery must never replace the original failure.
+            }
         }
 
         public void Dispose() => _activity?.Dispose();
