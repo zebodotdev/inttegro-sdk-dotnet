@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Inttegro;
 using Inttegro.Errors;
+using Inttegro.Diagnostics;
 
 namespace Inttegro.Http;
 
@@ -15,7 +16,15 @@ internal class ApiClient : IDisposable
     private readonly JsonSerializerOptions _serializerOptions;
     private readonly Telemetry _telemetry;
 
-    public ApiClient(string apiKey, string baseUrl, TimeSpan timeout, HttpClient? httpClient = null, bool telemetryEnabled = true)
+    public ApiClient(
+        string apiKey,
+        string baseUrl,
+        TimeSpan timeout,
+        HttpClient? httpClient = null,
+        bool telemetryEnabled = true,
+        ErrorReporter? errorReporter = null,
+        ErrorReportingPolicy errorReportingPolicy = ErrorReportingPolicy.Unexpected
+    )
     {
         if (string.IsNullOrWhiteSpace(apiKey))
         {
@@ -40,7 +49,7 @@ internal class ApiClient : IDisposable
         }
 
         _httpClient.BaseAddress = new Uri(baseUrl.TrimEnd('/'));
-        _telemetry = new Telemetry(_httpClient.BaseAddress, telemetryEnabled);
+        _telemetry = new Telemetry(_httpClient.BaseAddress, telemetryEnabled, errorReporter, errorReportingPolicy);
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
         _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd($"inttegro-sdk-dotnet/{InttegroClient.Version}");
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -309,13 +318,15 @@ internal class ApiClient : IDisposable
         }
         catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
         {
-            telemetryRequest.Fail("timeout");
-            throw new InttegroTimeoutException("Request timed out", ex);
+            var error = new InttegroTimeoutException("Request timed out", ex);
+            telemetryRequest.Fail(error, "timeout");
+            throw error;
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            telemetryRequest.Fail(cancellationToken.IsCancellationRequested ? "canceled" : "transport_error");
-            throw new InttegroNetworkException("Network request failed", ex);
+            var error = new InttegroNetworkException("Network request failed", ex);
+            telemetryRequest.Fail(error, cancellationToken.IsCancellationRequested ? "canceled" : "transport_error");
+            throw error;
         }
 
         telemetryRequest.Response(response);
@@ -323,8 +334,9 @@ internal class ApiClient : IDisposable
         var parsed = ParseJson(body);
         if (!response.IsSuccessStatusCode)
         {
-            telemetryRequest.Fail($"http_{(int)response.StatusCode}");
-            HandleError(response, body, parsed);
+            var error = CreateError(response, body, parsed);
+            telemetryRequest.Fail(error, $"http_{(int)response.StatusCode}");
+            throw error;
         }
         telemetryRequest.Decoded();
         return new WireEnvelope(parsed);
@@ -346,21 +358,24 @@ internal class ApiClient : IDisposable
         }
         catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
         {
-            telemetryRequest.Fail("timeout");
-            throw new InttegroTimeoutException("Request timed out", ex);
+            var error = new InttegroTimeoutException("Request timed out", ex);
+            telemetryRequest.Fail(error, "timeout");
+            throw error;
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            telemetryRequest.Fail(cancellationToken.IsCancellationRequested ? "canceled" : "transport_error");
-            throw new InttegroNetworkException("Network request failed", ex);
+            var error = new InttegroNetworkException("Network request failed", ex);
+            telemetryRequest.Fail(error, cancellationToken.IsCancellationRequested ? "canceled" : "transport_error");
+            throw error;
         }
         telemetryRequest.Response(response);
         var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            telemetryRequest.Fail($"http_{(int)response.StatusCode}");
             var body = Encoding.UTF8.GetString(bytes);
-            HandleError(response, body, ParseJson(body));
+            var error = CreateError(response, body, ParseJson(body));
+            telemetryRequest.Fail(error, $"http_{(int)response.StatusCode}");
+            throw error;
         }
         telemetryRequest.Decoded();
         return new FileDownload(bytes, response.Content.Headers.ContentType?.MediaType);
@@ -379,7 +394,7 @@ internal class ApiClient : IDisposable
         }
     }
 
-    private void HandleError(HttpResponseMessage response, string rawBody, JsonNode? parsed)
+    private InttegroApiException CreateError(HttpResponseMessage response, string rawBody, JsonNode? parsed)
     {
         var status = (int)response.StatusCode;
         var message = $"HTTP {status}";
@@ -403,10 +418,13 @@ internal class ApiClient : IDisposable
         var detail = payload?["detail"]?.GetValue<string>();
         var fixCode = payload?["fix_code"]?.GetValue<string>();
         var cause = payload?["cause"]?.GetValue<string>();
+        var requestId = response.Headers.TryGetValues("x-request-id", out var requestIdValues)
+            ? requestIdValues.FirstOrDefault()
+            : null;
 
         if (status == 401)
         {
-            throw new InttegroAuthenticationException(
+            return new InttegroAuthenticationException(
                 message,
                 status,
                 code,
@@ -416,7 +434,8 @@ internal class ApiClient : IDisposable
                 fixCode,
                 cause,
                 rawBody,
-                parsed
+                parsed,
+                requestId
             );
         }
 
@@ -432,7 +451,7 @@ internal class ApiClient : IDisposable
                 }
             }
 
-            throw new InttegroRateLimitException(
+            return new InttegroRateLimitException(
                 message,
                 status,
                 code,
@@ -443,11 +462,12 @@ internal class ApiClient : IDisposable
                 cause,
                 rawBody,
                 parsed,
-                retryAfter
+                retryAfter,
+                requestId
             );
         }
 
-        throw new InttegroApiException(
+        return new InttegroApiException(
             message,
             status,
             code,
@@ -457,7 +477,8 @@ internal class ApiClient : IDisposable
             fixCode,
             cause,
             rawBody,
-            parsed
+            parsed,
+            requestId
         );
     }
 

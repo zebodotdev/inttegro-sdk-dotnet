@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Inttegro.Http;
+using Inttegro.Diagnostics;
 using Inttegro.Resources;
 
 namespace Inttegro;
@@ -42,13 +43,23 @@ public class InttegroClient : IDisposable
         string? baseUrl = null,
         TimeSpan? timeout = null,
         HttpClient? httpClient = null,
-        bool telemetryEnabled = true
+        bool telemetryEnabled = true,
+        ErrorReporter? errorReporter = null,
+        ErrorReportingPolicy errorReportingPolicy = ErrorReportingPolicy.Unexpected
     )
     {
         var resolvedBaseUrl = string.IsNullOrWhiteSpace(baseUrl) ? "https://api.inttegro.com" : baseUrl!;
         var resolvedTimeout = timeout ?? TimeSpan.FromSeconds(30);
 
-        _apiClient = new ApiClient(apiKey, resolvedBaseUrl, resolvedTimeout, httpClient, telemetryEnabled);
+        _apiClient = new ApiClient(
+            apiKey,
+            resolvedBaseUrl,
+            resolvedTimeout,
+            httpClient,
+            telemetryEnabled,
+            errorReporter,
+            errorReportingPolicy
+        );
 
         Orders = new OrdersResource(_apiClient);
         Refunds = new RefundsResource(_apiClient);

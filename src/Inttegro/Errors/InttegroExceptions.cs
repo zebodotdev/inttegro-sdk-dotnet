@@ -1,10 +1,14 @@
 using System.Text.Json.Nodes;
+using Inttegro.Diagnostics;
 
 namespace Inttegro.Errors;
 
 public class InttegroException : Exception
 {
     public InttegroException(string message) : base(message) { }
+
+    /// <summary>The generated report, or null when no reporter was configured or selected it.</summary>
+    public ErrorReport? Report { get; internal set; }
 }
 
 public class InttegroNetworkException : InttegroException
@@ -35,6 +39,7 @@ public class InttegroApiException : InttegroException
     public string? Cause { get; }
     public string? Body { get; }
     public JsonNode? Data { get; }
+    public string? RequestId { get; }
 
     public InttegroApiException(
         string message,
@@ -46,7 +51,8 @@ public class InttegroApiException : InttegroException
         string? fixCode = null,
         string? cause = null,
         string? body = null,
-        JsonNode? data = null
+        JsonNode? data = null,
+        string? requestId = null
     )
         : base(message)
     {
@@ -59,6 +65,7 @@ public class InttegroApiException : InttegroException
         Cause = cause;
         Body = body;
         Data = data;
+        RequestId = requestId;
     }
 }
 
@@ -74,9 +81,10 @@ public class InttegroAuthenticationException : InttegroApiException
         string? fixCode = null,
         string? cause = null,
         string? body = null,
-        JsonNode? data = null
+        JsonNode? data = null,
+        string? requestId = null
     )
-        : base(message, statusCode, code, type, url, detail, fixCode, cause, body, data) { }
+        : base(message, statusCode, code, type, url, detail, fixCode, cause, body, data, requestId) { }
 }
 
 public class InttegroRateLimitException : InttegroApiException
@@ -94,9 +102,10 @@ public class InttegroRateLimitException : InttegroApiException
         string? cause = null,
         string? body = null,
         JsonNode? data = null,
-        int? retryAfterSeconds = null
+        int? retryAfterSeconds = null,
+        string? requestId = null
     )
-        : base(message, statusCode, code, type, url, detail, fixCode, cause, body, data)
+        : base(message, statusCode, code, type, url, detail, fixCode, cause, body, data, requestId)
     {
         RetryAfterSeconds = retryAfterSeconds;
     }
