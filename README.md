@@ -4,6 +4,8 @@
 
 The official .NET client for building server-side Inttegro integrations.
 
+[API documentation](https://dotnet.inttegro.dev/) · [Integration guides](https://studio.inttegro.com/sdks/dotnet)
+
 > **Fastest, most modern path:** connect an agent to [Inttegro MCP](https://studio.inttegro.com/inttegro-mcp) at `https://mcp.inttegro.com`, then ask it to run `design_integration`. It will produce an implementation and test plan for your application. Use this SDK when you are ready to connect that plan to your .NET service.
 
 All official Inttegro SDKs expose the same API capabilities. This package adds .NET-specific domain types, async APIs, and transport integration.

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "..",
+          "files": [
+            "src/Inttegro/Inttegro.csproj"
+          ]
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "index.md",
+          "toc.yml"
+        ]
+      },
+      {
+        "files": [
+          "api/**.yml",
+          "api/toc.yml"
+        ]
+      }
+    ],
+    "dest": "../build/api-docs",
+    "globalMetadata": {
+      "_appName": "Inttegro .NET SDK",
+      "_appTitle": "Inttegro .NET SDK",
+      "_enableSearch": true,
+      "_gitContribute": {
+        "repo": "https://github.com/zebodotdev/inttegro-sdk-dotnet"
+      }
+    }
+  }
+}

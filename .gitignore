@@ -3,6 +3,8 @@
 **/obj/
 /TestResults/
 /artifacts/
+/build/
+/docs/api/
 
 ## User-specific
 *.user
