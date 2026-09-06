@@ -38,7 +38,7 @@ public class InttegroApiException : InttegroException
     public string? FixCode { get; }
     public string? Cause { get; }
     public string? Body { get; }
-    public JsonNode? Data { get; }
+    public new JsonNode? Data { get; }
     public string? RequestId { get; }
 
     public InttegroApiException(
