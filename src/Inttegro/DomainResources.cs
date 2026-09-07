@@ -347,7 +347,6 @@ public sealed class PaymentMethodDeletion
 public sealed class PurchaseIntent
 {
     [JsonPropertyName("id")] public string? Id { get; set; }
-    [JsonPropertyName("application_id")] public string? ApplicationId { get; set; }
     [JsonPropertyName("product_id")] public string? ProductId { get; set; }
     [JsonPropertyName("price_id")] public string? PriceId { get; set; }
     [JsonPropertyName("quantity")] public PurchaseIntentQuantity? Quantity { get; set; }
