@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Inttegro;
@@ -16,7 +14,6 @@ public sealed class App
     [JsonPropertyName("archived_at")] public string? ArchivedAt { get; set; }
     [JsonPropertyName("secret_key")] public GeneratedSecretKey? SecretKey { get; set; }
     [JsonPropertyName("relationship")] public AppRelationship? Relationship { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class AppRelationship
@@ -30,9 +27,15 @@ public sealed class AppRelationship
     [JsonPropertyName("subject_app_id")] public string? SubjectAppId { get; set; }
     [JsonPropertyName("child_app_id")] public string? ChildAppId { get; set; }
     [JsonPropertyName("child_standing")] public string? ChildStanding { get; set; }
-    [JsonPropertyName("relationship_policy")] public JsonObject? RelationshipPolicy { get; set; }
+    [JsonPropertyName("relationship_policy")] public AppRelationshipPolicy? RelationshipPolicy { get; set; }
     [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
+}
+
+public sealed class AppRelationshipPolicy
+{
+    [JsonPropertyName("child_standing")] public string? ChildStanding { get; set; }
+    [JsonPropertyName("management")] public string? Management { get; set; }
+    [JsonPropertyName("credentials")] public string? Credentials { get; set; }
 }
 
 public sealed class BalanceAmount
@@ -49,7 +52,20 @@ public sealed class BalanceBreakdown
     [JsonPropertyName("includes_transactions_before")] public string? IncludesTransactionsBefore { get; set; }
 }
 
-public sealed class BalanceSnapshot : Dictionary<string, BalanceBreakdown> { }
+[JsonConverter(typeof(BalanceSnapshotJsonConverter))]
+public sealed class BalanceSnapshot : IReadOnlyDictionary<string, BalanceBreakdown>
+{
+    private readonly Dictionary<string, BalanceBreakdown> _values = new();
+    internal IDictionary<string, BalanceBreakdown> MutableValues => _values;
+    public BalanceBreakdown this[string key] => _values[key];
+    public IEnumerable<string> Keys => _values.Keys;
+    public IEnumerable<BalanceBreakdown> Values => _values.Values;
+    public int Count => _values.Count;
+    public bool ContainsKey(string key) => _values.ContainsKey(key);
+    public bool TryGetValue(string key, out BalanceBreakdown value) => _values.TryGetValue(key, out value!);
+    public IEnumerator<KeyValuePair<string, BalanceBreakdown>> GetEnumerator() => _values.GetEnumerator();
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+}
 
 public sealed class BalanceTransactionPage
 {
@@ -72,7 +88,6 @@ public sealed class Broadcast
     [JsonPropertyName("canceled_at")] public string? CanceledAt { get; set; }
     [JsonPropertyName("chime_ids")] public List<string>? ChimeIds { get; set; }
     [JsonPropertyName("errors")] public List<ApiError>? Errors { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class Chime
@@ -83,11 +98,46 @@ public sealed class Chime
     [JsonPropertyName("sender_id")] public string? SenderId { get; set; }
     [JsonPropertyName("purpose")] public string? Purpose { get; set; }
     [JsonPropertyName("customer_id")] public string? CustomerId { get; set; }
-    [JsonPropertyName("recipient")] public JsonObject? Recipient { get; set; }
-    [JsonPropertyName("email")] public JsonObject? Email { get; set; }
+    [JsonPropertyName("recipient")] public ChimeRecipient? Recipient { get; set; }
+    [JsonPropertyName("email")] public ChimeEmailMessage? Email { get; set; }
     [JsonPropertyName("transmission")] public ChimeTransmission? Transmission { get; set; }
-    [JsonPropertyName("custom_data")] public Dictionary<string, string>? CustomData { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
+    [JsonPropertyName("custom_data")] public CustomData? CustomData { get; set; }
+}
+
+public sealed class ChimeRecipient
+{
+    [JsonPropertyName("type")] public string? Type { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("phone")] public ChimeRecipientPhone? Phone { get; set; }
+    [JsonPropertyName("email")] public ChimeRecipientEmail? Email { get; set; }
+}
+
+public sealed class ChimeRecipientPhone
+{
+    [JsonPropertyName("number")] public string? Number { get; set; }
+}
+
+public sealed class ChimeRecipientEmail
+{
+    [JsonPropertyName("address")] public string? Address { get; set; }
+}
+
+public sealed class MessageMailbox
+{
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("address")] public string? Address { get; set; }
+}
+
+public sealed class ChimeEmailMessage
+{
+    [JsonPropertyName("subject")] public string? Subject { get; set; }
+    [JsonPropertyName("text")] public string? Text { get; set; }
+    [JsonPropertyName("html")] public string? Html { get; set; }
+    [JsonPropertyName("from")] public MessageMailbox? From { get; set; }
+    [JsonPropertyName("reply_to")] public MessageMailbox? ReplyTo { get; set; }
+    [JsonPropertyName("headers")] public MessageHeaders? Headers { get; set; }
+    [JsonPropertyName("safety")] public MessageTemplateSafetyResult? Safety { get; set; }
+    [JsonPropertyName("schema")] public JsonData? Schema { get; set; }
 }
 
 public sealed class ChimeTransmission
@@ -122,7 +172,6 @@ public sealed class ScheduledChime
     [JsonPropertyName("canceled_at")] public string? CanceledAt { get; set; }
     [JsonPropertyName("chime_ids")] public List<string>? ChimeIds { get; set; }
     [JsonPropertyName("errors")] public List<ApiError>? Errors { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class MessageTemplate
@@ -134,15 +183,68 @@ public sealed class MessageTemplate
     [JsonPropertyName("purpose")] public string? Purpose { get; set; }
     [JsonPropertyName("locale")] public string? Locale { get; set; }
     [JsonPropertyName("status")] public string? Status { get; set; }
-    [JsonPropertyName("sms")] public JsonObject? Sms { get; set; }
-    [JsonPropertyName("email")] public JsonObject? Email { get; set; }
-    [JsonPropertyName("variables")] public List<JsonObject>? Variables { get; set; }
+    [JsonPropertyName("sms")] public MessageTemplateSmsContent? Sms { get; set; }
+    [JsonPropertyName("email")] public MessageTemplateEmailContent? Email { get; set; }
+    [JsonPropertyName("variables")] public List<MessageTemplateVariable>? Variables { get; set; }
     [JsonPropertyName("attachments")] public List<string>? Attachments { get; set; }
     [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
     [JsonPropertyName("updated_at")] public string? UpdatedAt { get; set; }
     [JsonPropertyName("published_at")] public string? PublishedAt { get; set; }
     [JsonPropertyName("archived_at")] public string? ArchivedAt { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
+}
+
+public sealed class MessageTemplateSmsContent
+{
+    [JsonPropertyName("message_template")] public string? MessageTemplate { get; set; }
+}
+
+public sealed class MessageTemplateEmailContent
+{
+    [JsonPropertyName("subject")] public string? Subject { get; set; }
+    [JsonPropertyName("html")] public string? Html { get; set; }
+    [JsonPropertyName("from")] public MessageMailbox? From { get; set; }
+    [JsonPropertyName("reply_to")] public MessageMailbox? ReplyTo { get; set; }
+    [JsonPropertyName("headers")] public MessageHeaders? Headers { get; set; }
+}
+
+public sealed class MessageTemplateVariable
+{
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("type")] public string? Type { get; set; }
+    [JsonPropertyName("required")] public bool? Required { get; set; }
+    [JsonPropertyName("default")] public JsonValue? Default { get; set; }
+    [JsonPropertyName("about")] public string? About { get; set; }
+    [JsonPropertyName("items")] public List<MessageTemplateVariableItem>? Items { get; set; }
+}
+
+public sealed class MessageTemplateVariableItem
+{
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("type")] public string? Type { get; set; }
+    [JsonPropertyName("required")] public bool? Required { get; set; }
+    [JsonPropertyName("default")] public JsonValue? Default { get; set; }
+    [JsonPropertyName("about")] public string? About { get; set; }
+}
+
+public sealed class MessageTemplateSafetyResult
+{
+    [JsonPropertyName("content_hash")] public string? ContentHash { get; set; }
+    [JsonPropertyName("links")] public List<MessageTemplateScannedLink>? Links { get; set; }
+    [JsonPropertyName("normalized_text")] public string? NormalizedText { get; set; }
+    [JsonPropertyName("quarantine_notes")] public string? QuarantineNotes { get; set; }
+    [JsonPropertyName("reason_codes")] public List<string>? ReasonCodes { get; set; }
+    [JsonPropertyName("sanitized_html")] public string? SanitizedHtml { get; set; }
+    [JsonPropertyName("scanner")] public string? Scanner { get; set; }
+    [JsonPropertyName("status")] public string? Status { get; set; }
+}
+
+public sealed class MessageTemplateScannedLink
+{
+    [JsonPropertyName("host")] public string? Host { get; set; }
+    [JsonPropertyName("raw")] public string? Raw { get; set; }
+    [JsonPropertyName("reason")] public string? Reason { get; set; }
+    [JsonPropertyName("scheme")] public string? Scheme { get; set; }
+    [JsonPropertyName("status")] public string? Status { get; set; }
 }
 
 public sealed class MessageTemplatePage
@@ -155,7 +257,31 @@ public sealed class MessageTemplatePage
 public sealed class MessageTemplatePreview
 {
     [JsonPropertyName("message_template")] public MessageTemplate? MessageTemplate { get; set; }
-    [JsonPropertyName("rendered")] public JsonObject? Rendered { get; set; }
+    [JsonPropertyName("rendered")] public RenderedMessageTemplate? Rendered { get; set; }
+}
+
+public sealed class RenderedMessageTemplate
+{
+    [JsonPropertyName("channel")] public string? Channel { get; set; }
+    [JsonPropertyName("attachments")] public List<string>? Attachments { get; set; }
+    [JsonPropertyName("sms")] public RenderedSmsMessageTemplate? Sms { get; set; }
+    [JsonPropertyName("email")] public RenderedEmailMessageTemplate? Email { get; set; }
+}
+
+public sealed class RenderedSmsMessageTemplate
+{
+    [JsonPropertyName("full_message")] public string? FullMessage { get; set; }
+}
+
+public sealed class RenderedEmailMessageTemplate
+{
+    [JsonPropertyName("subject")] public string? Subject { get; set; }
+    [JsonPropertyName("text")] public string? Text { get; set; }
+    [JsonPropertyName("html")] public string? Html { get; set; }
+    [JsonPropertyName("from")] public MessageMailbox? From { get; set; }
+    [JsonPropertyName("reply_to")] public MessageMailbox? ReplyTo { get; set; }
+    [JsonPropertyName("headers")] public MessageHeaders? Headers { get; set; }
+    [JsonPropertyName("safety")] public MessageTemplateSafetyResult? Safety { get; set; }
 }
 
 public sealed class OtpTransaction
@@ -168,7 +294,6 @@ public sealed class OtpTransaction
     [JsonPropertyName("canceled_at")] public string? CanceledAt { get; set; }
     [JsonPropertyName("cancel_reason")] public string? CancelReason { get; set; }
     [JsonPropertyName("transmission")] public ChimeTransmission? Transmission { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class OtpVerificationAttempt
@@ -177,7 +302,13 @@ public sealed class OtpVerificationAttempt
     [JsonPropertyName("recipient")] public string? Recipient { get; set; }
     [JsonPropertyName("presented_token")] public string? PresentedToken { get; set; }
     [JsonPropertyName("attempted_at")] public string? AttemptedAt { get; set; }
-    [JsonPropertyName("result")] public JsonObject? Result { get; set; }
+    [JsonPropertyName("result")] public OtpVerificationAttemptResult? Result { get; set; }
+}
+
+public sealed class OtpVerificationAttemptResult
+{
+    [JsonPropertyName("detail")] public string? Detail { get; set; }
+    [JsonPropertyName("verdict")] public string? Verdict { get; set; }
 }
 
 public sealed class OtpVerification
@@ -257,8 +388,7 @@ public sealed class StoredFile
     [JsonPropertyName("updated_at")] public string? UpdatedAt { get; set; }
     [JsonPropertyName("deleted_at")] public string? DeletedAt { get; set; }
     [JsonPropertyName("title")] public string? Title { get; set; }
-    [JsonPropertyName("custom_data")] public Dictionary<string, string>? CustomData { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
+    [JsonPropertyName("custom_data")] public CustomData? CustomData { get; set; }
 }
 
 public sealed class StoredFilePage
@@ -276,8 +406,7 @@ public sealed class FileLink
     [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
     [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
     [JsonPropertyName("revoked_at")] public string? RevokedAt { get; set; }
-    [JsonPropertyName("custom_data")] public Dictionary<string, string>? CustomData { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
+    [JsonPropertyName("custom_data")] public CustomData? CustomData { get; set; }
 }
 
 public sealed class FileLinkPage
@@ -308,12 +437,36 @@ public sealed class UploadRequest
     [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
     [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
     [JsonPropertyName("canceled_at")] public string? CanceledAt { get; set; }
-    [JsonPropertyName("custom_data")] public Dictionary<string, string>? CustomData { get; set; }
-    [JsonPropertyName("metadata")] public Dictionary<string, string>? Metadata { get; set; }
-    [JsonPropertyName("constraints")] public JsonObject? Constraints { get; set; }
-    [JsonPropertyName("display")] public JsonObject? Display { get; set; }
-    [JsonPropertyName("attempts")] public JsonObject? Attempts { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
+    [JsonPropertyName("custom_data")] public CustomData? CustomData { get; set; }
+    [JsonPropertyName("metadata")] public FileMetadata? Metadata { get; set; }
+    [JsonPropertyName("constraints")] public UploadRequestConstraints? Constraints { get; set; }
+    [JsonPropertyName("display")] public UploadRequestDisplay? Display { get; set; }
+    [JsonPropertyName("attempts")] public UploadRequestAttempts? Attempts { get; set; }
+}
+
+public sealed class UploadRequestConstraints
+{
+    [JsonPropertyName("min_size")] public long? MinSize { get; set; }
+    [JsonPropertyName("max_size")] public long? MaxSize { get; set; }
+    [JsonPropertyName("exact_size")] public long? ExactSize { get; set; }
+    [JsonPropertyName("content_types")] public List<string>? ContentTypes { get; set; }
+    [JsonPropertyName("extensions")] public List<string>? Extensions { get; set; }
+    [JsonPropertyName("filename")] public string? Filename { get; set; }
+}
+
+public sealed class UploadRequestDisplay
+{
+    [JsonPropertyName("title")] public string? Title { get; set; }
+    [JsonPropertyName("description")] public string? Description { get; set; }
+    [JsonPropertyName("help_text")] public string? HelpText { get; set; }
+}
+
+public sealed class UploadRequestAttempts
+{
+    [JsonPropertyName("max_attempts")] public int? MaxAttempts { get; set; }
+    [JsonPropertyName("attempt_count")] public int? AttemptCount { get; set; }
+    [JsonPropertyName("failed_attempt_count")] public int? FailedAttemptCount { get; set; }
+    [JsonPropertyName("last_attempted_at")] public string? LastAttemptedAt { get; set; }
 }
 
 public sealed class UploadRequestPage
@@ -335,7 +488,7 @@ public sealed class PaymentMethodVerificationSession
     [JsonPropertyName("status")] public string? Status { get; set; }
     [JsonPropertyName("token_sent_at")] public string? TokenSentAt { get; set; }
     [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
-    [JsonPropertyName("delivery")] public JsonObject? Delivery { get; set; }
+    [JsonPropertyName("delivery")] public JsonData? Delivery { get; set; }
 }
 
 public sealed class PaymentMethodDeletion
@@ -356,7 +509,6 @@ public sealed class PurchaseIntent
     [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
     [JsonPropertyName("product")] public Product? Product { get; set; }
     [JsonPropertyName("price")] public PurchaseIntentPrice? Price { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class PurchaseIntentPage
@@ -374,7 +526,19 @@ public sealed class CountrySpecification
     [JsonPropertyName("payment_methods")] public List<string>? PaymentMethods { get; set; }
     [JsonPropertyName("payout_schedules")] public List<string>? PayoutSchedules { get; set; }
     [JsonPropertyName("bt_aging_specs")] public List<string>? BalanceTransactionAgingSpecs { get; set; }
-    [JsonExtensionData] public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
-public sealed class CountrySpecifications : Dictionary<string, CountrySpecification> { }
+[JsonConverter(typeof(CountrySpecificationsJsonConverter))]
+public sealed class CountrySpecifications : IReadOnlyDictionary<string, CountrySpecification>
+{
+    private readonly Dictionary<string, CountrySpecification> _values = new();
+    internal IDictionary<string, CountrySpecification> MutableValues => _values;
+    public CountrySpecification this[string key] => _values[key];
+    public IEnumerable<string> Keys => _values.Keys;
+    public IEnumerable<CountrySpecification> Values => _values.Values;
+    public int Count => _values.Count;
+    public bool ContainsKey(string key) => _values.ContainsKey(key);
+    public bool TryGetValue(string key, out CountrySpecification value) => _values.TryGetValue(key, out value!);
+    public IEnumerator<KeyValuePair<string, CountrySpecification>> GetEnumerator() => _values.GetEnumerator();
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+}

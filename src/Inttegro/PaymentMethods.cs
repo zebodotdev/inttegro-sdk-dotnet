@@ -1,6 +1,5 @@
 using System.Runtime.Serialization;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Inttegro;
@@ -216,7 +215,7 @@ public sealed class PaymentMethodUpdateRequest
     public string? PaymentMethodId { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string?>? CustomData { get; set; }
+    public CustomDataPatch? CustomData { get; set; }
 
     [JsonPropertyName("active")]
     public bool? Active { get; set; }
@@ -225,7 +224,28 @@ public sealed class PaymentMethodUpdateRequest
     public bool? Archived { get; set; }
 
     [JsonPropertyName("owner")]
-    public JsonObject? Owner { get; set; }
+    public PaymentMethodOwnerInput? Owner { get; set; }
+}
+
+public sealed class PaymentMethodOwnerInput
+{
+    [JsonPropertyName("address")]
+    public PaymentMethodOwnerAddress? Address { get; set; }
+
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+}
+
+public sealed class PaymentMethodOwnerAddress
+{
+    [JsonPropertyName("city")] public string? City { get; set; }
+    [JsonPropertyName("country")] public string? Country { get; set; }
+    [JsonPropertyName("line1")] public string? Line1 { get; set; }
+    [JsonPropertyName("line2")] public string? Line2 { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("phone_number")] public string? PhoneNumber { get; set; }
+    [JsonPropertyName("post_code")] public string? PostCode { get; set; }
+    [JsonPropertyName("region")] public string? Region { get; set; }
 }
 
 public sealed class PaymentMethodDeleteRequest
@@ -261,7 +281,7 @@ public sealed class PaymentMethod
     public PaymentMethodVerification? Verification { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("expires_on")]
     public string? ExpiresOn { get; set; }
@@ -274,9 +294,6 @@ public sealed class PaymentMethod
 
     [JsonPropertyName("verified_at")]
     public string? VerifiedAt { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class PaymentMethodTypeSetting

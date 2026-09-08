@@ -190,12 +190,9 @@ public sealed class PaymentNextAction
 {
     [JsonPropertyName("type")] public PaymentNextActionType? Type { get; set; }
     [JsonPropertyName("confirm_payment")] public PaymentConfirmAction? ConfirmPayment { get; set; }
-    [JsonPropertyName("execute")] public JsonObject? Execute { get; set; }
+    [JsonPropertyName("execute")] public JsonData? Execute { get; set; }
     [JsonPropertyName("redirect")] public PaymentRedirectAction? Redirect { get; set; }
     [JsonPropertyName("authorize")] public PaymentAuthorizeAction? Authorize { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class Payment
@@ -213,7 +210,4 @@ public sealed class Payment
     [JsonPropertyName("paid_at")] public string? PaidAt { get; set; }
     [JsonPropertyName("failed_at")] public string? FailedAt { get; set; }
     [JsonPropertyName("balance_transaction")] public BalanceTransaction? BalanceTransaction { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
 }

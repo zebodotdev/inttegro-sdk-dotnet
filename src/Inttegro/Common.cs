@@ -62,9 +62,6 @@ public sealed class ApiError
 
     [JsonPropertyName("cause")]
     public string? Cause { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? AdditionalData { get; set; }
 }
 
 public sealed class Address
@@ -133,7 +130,7 @@ public sealed class CustomerData
     public string? Reference { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+    public CustomDataInput? CustomData { get; set; }
 }
 
 public sealed class CheckoutSettings
@@ -205,7 +202,7 @@ public sealed class ProductDetailsParams
     public string? TaxCode { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+    public CustomDataInput? CustomData { get; set; }
 }
 
 public sealed class ProductDetails
@@ -235,7 +232,7 @@ public sealed class ProductDetails
     public string? TaxCode { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 }
 
 public sealed class FeeDetailsParams
@@ -253,7 +250,7 @@ public sealed class FeeDetailsParams
     public string? Description { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+    public CustomDataInput? CustomData { get; set; }
 
     [JsonPropertyName("amount")]
     public AmountParams? Amount { get; set; }
@@ -274,7 +271,7 @@ public sealed class FeeDetails
     public string? Description { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("amount")]
     public Amount? Amount { get; set; }
@@ -289,7 +286,7 @@ public sealed class ShippingDetailsParams
     public string? TaxCode { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+    public CustomDataInput? CustomData { get; set; }
 
     [JsonPropertyName("fee")]
     public AmountParams? Fee { get; set; }
@@ -304,7 +301,7 @@ public sealed class ShippingDetails
     public string? TaxCode { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("fee")]
     public Amount? Fee { get; set; }

@@ -1,6 +1,4 @@
 using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Inttegro.BankAccounts;
 using Inttegro.Wallets;
@@ -27,8 +25,32 @@ public sealed class PullPushConfig
     public string? EnabledAt { get; set; }
 
     [JsonPropertyName("mandate")]
-    public JsonObject? Mandate { get; set; }
+    public FinancialAccountMandate? Mandate { get; set; }
 }
+
+public sealed class FinancialAccountMandate
+{
+    [JsonPropertyName("id")] public string? Id { get; set; }
+    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
+    [JsonPropertyName("user_agent")] public string? UserAgent { get; set; }
+    [JsonPropertyName("ip_address")] public string? IpAddress { get; set; }
+}
+
+public sealed class FinancialAccountVerificationRequest
+{
+    [JsonPropertyName("id")] public string? Id { get; set; }
+    [JsonPropertyName("mechanism")] public string? Mechanism { get; set; }
+    [JsonPropertyName("type")] public string? Type { get; set; }
+}
+
+public sealed class FinancialAccountVerification
+{
+    [JsonPropertyName("initiated_at")] public string? InitiatedAt { get; set; }
+    [JsonPropertyName("completed_at")] public string? CompletedAt { get; set; }
+    [JsonPropertyName("request")] public FinancialAccountVerificationRequest? Request { get; set; }
+}
+
+public sealed class DoshAccount { }
 
 public sealed class FinancialAccountCreateRequest
 {
@@ -60,10 +82,10 @@ public sealed class FinancialAccountCreateRequest
     public BankAccountConfig? BankAccount { get; set; }
 
     [JsonPropertyName("dosh_account")]
-    public JsonObject? DoshAccount { get; set; }
+    public DoshAccount? DoshAccount { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomDataInput? CustomData { get; set; }
 
     [JsonPropertyName("owner")]
     public BankAccountOwner? Owner { get; set; }
@@ -78,7 +100,7 @@ public sealed class FinancialAccount
     public string? Currency { get; set; }
 
     [JsonPropertyName("verification")]
-    public JsonObject? Verification { get; set; }
+    public FinancialAccountVerification? Verification { get; set; }
 
     [JsonPropertyName("push_configuration")]
     public PullPushConfig? PushConfiguration { get; set; }
@@ -114,10 +136,10 @@ public sealed class FinancialAccount
     public BankAccountConfig? BankAccount { get; set; }
 
     [JsonPropertyName("dosh_account")]
-    public JsonObject? DoshAccount { get; set; }
+    public DoshAccount? DoshAccount { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("owner")]
     public BankAccountOwner? Owner { get; set; }
@@ -138,7 +160,7 @@ public sealed class FinancialAccountUpdateRequest
     public string? Reference { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string?>? CustomData { get; set; }
+    public CustomDataPatch? CustomData { get; set; }
 
     [JsonPropertyName("owner")]
     public BankAccountOwner? Owner { get; set; }
@@ -163,9 +185,6 @@ public sealed class FinancialAccountArchiveRequest
 {
     [JsonPropertyName("account_id")]
     public string? AccountId { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class FinancialAccountPageRequest
@@ -196,7 +215,4 @@ public sealed class FinancialAccountVerifyRequest
 
     [JsonPropertyName("token")]
     public string? Token { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
 }

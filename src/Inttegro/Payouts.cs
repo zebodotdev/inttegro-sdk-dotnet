@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Inttegro.Money;
 
@@ -8,7 +7,7 @@ namespace Inttegro;
 public sealed class PayoutSetDestinationsRequest
 {
     [JsonPropertyName("destinations")]
-    public Dictionary<string, string>? Destinations { get; set; }
+    public PayoutDestinations? Destinations { get; set; }
 }
 
 public sealed class PayoutSettings
@@ -17,7 +16,7 @@ public sealed class PayoutSettings
     public bool? FxEnabled { get; set; }
 
     [JsonPropertyName("destinations")]
-    public Dictionary<string, string>? Destinations { get; set; }
+    public PayoutDestinations? Destinations { get; set; }
 
     [JsonPropertyName("schedule")]
     public PayoutSchedule? Schedule { get; set; }
@@ -125,7 +124,7 @@ public sealed class Payout
     public string? LatestAttemptId { get; set; }
 
     [JsonPropertyName("latest_error")]
-    public JsonObject? LatestError { get; set; }
+    public PayoutError? LatestError { get; set; }
 
     [JsonPropertyName("initiated_at")]
     public string? InitiatedAt { get; set; }
@@ -150,7 +149,12 @@ public sealed class Payout
 
     [JsonPropertyName("balance_transaction_ids")]
     public List<string>? BalanceTransactionIds { get; set; }
+}
 
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
+public sealed class PayoutError
+{
+    [JsonPropertyName("cause")] public string? Cause { get; set; }
+    [JsonPropertyName("message")] public string? Message { get; set; }
+    [JsonPropertyName("occurred_at")] public string? OccurredAt { get; set; }
+    [JsonPropertyName("type")] public string? Type { get; set; }
 }

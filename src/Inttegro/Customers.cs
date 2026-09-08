@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using System.Text.Json.Nodes;
+using Inttegro.Money;
 
 namespace Inttegro;
 
@@ -27,7 +27,7 @@ public sealed class CreateCustomerRequest
     public string? PhoneNumber { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomDataInput? CustomData { get; set; }
 }
 
 public sealed class LookupCustomerRequest
@@ -42,7 +42,7 @@ public sealed class UpdateCustomerRequest
     public Address? BillingAddress { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, JsonNode?>? CustomData { get; set; }
+    public CustomDataInput? CustomData { get; set; }
 
     [JsonPropertyName("customer_id")]
     public string? CustomerId { get; set; }
@@ -80,6 +80,12 @@ public sealed class PageCustomersRequest
 
 public sealed class Customer
 {
+    [JsonPropertyName("balance")]
+    public CustomerBalance? Balance { get; set; }
+
+    [JsonPropertyName("billing_address")]
+    public Address? BillingAddress { get; set; }
+
     [JsonPropertyName("id")]
     public string? Id { get; set; }
 
@@ -102,10 +108,43 @@ public sealed class Customer
     public string? PhoneNumber { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("created_at")]
     public string? CreatedAt { get; set; }
+
+    [JsonPropertyName("guest")]
+    public bool Guest { get; set; }
+
+    [JsonPropertyName("shipping_address")]
+    public Address? ShippingAddress { get; set; }
+
+    [JsonPropertyName("updated_at")]
+    public string? UpdatedAt { get; set; }
+}
+
+[JsonConverter(typeof(CustomerBalanceJsonConverter))]
+public sealed class CustomerBalance : IReadOnlyDictionary<string, CustomerBalanceValue>
+{
+    private readonly Dictionary<string, CustomerBalanceValue> _values = new();
+    internal IDictionary<string, CustomerBalanceValue> MutableValues => _values;
+    public CustomerBalanceValue this[string key] => _values[key];
+    public IEnumerable<string> Keys => _values.Keys;
+    public IEnumerable<CustomerBalanceValue> Values => _values.Values;
+    public int Count => _values.Count;
+    public bool ContainsKey(string key) => _values.ContainsKey(key);
+    public bool TryGetValue(string key, out CustomerBalanceValue value) => _values.TryGetValue(key, out value!);
+    public IEnumerator<KeyValuePair<string, CustomerBalanceValue>> GetEnumerator() => _values.GetEnumerator();
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+}
+
+public sealed class CustomerBalanceValue
+{
+    [JsonPropertyName("as_of")]
+    public string? AsOf { get; set; }
+
+    [JsonPropertyName("available")]
+    public Amount? Available { get; set; }
 }
 
 public sealed class CustomersPage

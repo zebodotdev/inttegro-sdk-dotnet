@@ -3,18 +3,6 @@ using Inttegro.Money;
 
 namespace Inttegro;
 
-public sealed class ProductCategory
-{
-    [JsonPropertyName("id")]
-    public string? Id { get; set; }
-
-    [JsonPropertyName("name")]
-    public string? Name { get; set; }
-
-    [JsonPropertyName("slug")]
-    public string? Slug { get; set; }
-}
-
 public sealed class ProductDefaultUnitPrice
 {
     [JsonPropertyName("id")]
@@ -54,40 +42,66 @@ public sealed class ProductPriceSummary
     public Amount? Nominal { get; set; }
 }
 
-public sealed class ProductShipmentDimensions
+public sealed class ProductAttribute
 {
-    [JsonPropertyName("length")]
-    public decimal? Length { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("value")] public string? Value { get; set; }
+}
 
-    [JsonPropertyName("width")]
-    public decimal? Width { get; set; }
+public sealed class ProductPhysicalDimensions
+{
+    [JsonPropertyName("weight_unit")] public string? WeightUnit { get; set; }
+    [JsonPropertyName("weight")] public decimal? Weight { get; set; }
+    [JsonPropertyName("size")] public decimal? Size { get; set; }
+    [JsonPropertyName("volume_unit")] public string? VolumeUnit { get; set; }
+    [JsonPropertyName("volume")] public decimal? Volume { get; set; }
+    [JsonPropertyName("length")] public decimal? Length { get; set; }
+    [JsonPropertyName("height")] public decimal? Height { get; set; }
+    [JsonPropertyName("width")] public decimal? Width { get; set; }
+}
 
-    [JsonPropertyName("height")]
-    public decimal? Height { get; set; }
+public sealed class ProductDigitalDimensions
+{
+    [JsonPropertyName("bytes")] public decimal? Bytes { get; set; }
+    [JsonPropertyName("size_unit")] public string? SizeUnit { get; set; }
+    [JsonPropertyName("size")] public decimal? Size { get; set; }
+}
 
-    [JsonPropertyName("weight")]
-    public decimal? Weight { get; set; }
+public sealed class ProductCustomDimensions
+{
+    [JsonPropertyName("size_unit")] public string? SizeUnit { get; set; }
+    [JsonPropertyName("size")] public decimal? Size { get; set; }
+    [JsonPropertyName("details")] public ProductDimensionDetails? Details { get; set; }
+}
+
+public sealed class ProductDimensions
+{
+    [JsonPropertyName("physical")] public ProductPhysicalDimensions? Physical { get; set; }
+    [JsonPropertyName("digital")] public ProductDigitalDimensions? Digital { get; set; }
+    [JsonPropertyName("custom")] public ProductCustomDimensions? Custom { get; set; }
+}
+
+public sealed class ProductMedia
+{
+    [JsonPropertyName("hero_image")] public string? HeroImage { get; set; }
+    [JsonPropertyName("thumbnail")] public string? Thumbnail { get; set; }
+    [JsonPropertyName("web_page_url")] public string? WebPageUrl { get; set; }
+    [JsonPropertyName("brand_logo")] public string? BrandLogo { get; set; }
+    [JsonPropertyName("infographic")] public string? Infographic { get; set; }
+    [JsonPropertyName("promo_video")] public string? PromoVideo { get; set; }
+    [JsonPropertyName("demo_video")] public string? DemoVideo { get; set; }
+    [JsonPropertyName("gallery")] public List<string>? Gallery { get; set; }
+    [JsonPropertyName("downloads")] public List<string>? Downloads { get; set; }
 }
 
 public sealed class ProductShipment
 {
-    [JsonPropertyName("type")]
-    public string? Type { get; set; }
-
-    [JsonPropertyName("carrier")]
-    public string? Carrier { get; set; }
-
-    [JsonPropertyName("dimensions")]
-    public ProductShipmentDimensions? Dimensions { get; set; }
-}
-
-public sealed class ProductMediaItem
-{
-    [JsonPropertyName("url")]
-    public string? Url { get; set; }
-
-    [JsonPropertyName("type")]
-    public string? Type { get; set; }
+    [JsonPropertyName("type")] public string? Type { get; set; }
+    [JsonPropertyName("delivery")] public JsonData? Delivery { get; set; }
+    [JsonPropertyName("download")] public JsonData? Download { get; set; }
+    [JsonPropertyName("render")] public JsonData? Render { get; set; }
+    [JsonPropertyName("service")] public JsonData? Service { get; set; }
+    [JsonPropertyName("stream")] public JsonData? Stream { get; set; }
 }
 
 public sealed class CreateProductRequest
@@ -111,19 +125,28 @@ public sealed class CreateProductRequest
     public string? TaxCode { get; set; }
 
     [JsonPropertyName("category")]
-    public ProductCategory? Category { get; set; }
+    public string? Category { get; set; }
 
     [JsonPropertyName("shipment")]
     public ProductShipment? Shipment { get; set; }
 
+    [JsonPropertyName("dimensions")]
+    public ProductDimensions? Dimensions { get; set; }
+
+    [JsonPropertyName("unit_dimension")]
+    public string? UnitDimension { get; set; }
+
     [JsonPropertyName("media")]
-    public List<ProductMediaItem>? Media { get; set; }
+    public ProductMedia? Media { get; set; }
 
     [JsonPropertyName("attributes")]
-    public Dictionary<string, string>? Attributes { get; set; }
+    public List<ProductAttribute>? Attributes { get; set; }
+
+    [JsonPropertyName("publish")]
+    public bool? Publish { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 }
 
 public sealed class LookupProductRequest
@@ -136,6 +159,9 @@ public sealed class UpdateProductRequest
 {
     [JsonPropertyName("product_id")]
     public string? ProductId { get; set; }
+
+    [JsonPropertyName("type")]
+    public ProductType? Type { get; set; }
 
     [JsonPropertyName("reference")]
     public string? Reference { get; set; }
@@ -153,19 +179,25 @@ public sealed class UpdateProductRequest
     public string? TaxCode { get; set; }
 
     [JsonPropertyName("category")]
-    public ProductCategory? Category { get; set; }
+    public string? Category { get; set; }
 
     [JsonPropertyName("shipment")]
     public ProductShipment? Shipment { get; set; }
 
+    [JsonPropertyName("dimensions")]
+    public ProductDimensions? Dimensions { get; set; }
+
+    [JsonPropertyName("unit_dimension")]
+    public string? UnitDimension { get; set; }
+
     [JsonPropertyName("media")]
-    public List<ProductMediaItem>? Media { get; set; }
+    public ProductMedia? Media { get; set; }
 
     [JsonPropertyName("attributes")]
-    public Dictionary<string, string>? Attributes { get; set; }
+    public List<ProductAttribute>? Attributes { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 }
 
 public sealed class ProductActionRequest
@@ -237,7 +269,7 @@ public sealed class Product
     public string? TaxCode { get; set; }
 
     [JsonPropertyName("category")]
-    public ProductCategory? Category { get; set; }
+    public string? Category { get; set; }
 
     [JsonPropertyName("default_unit_price")]
     public ProductDefaultUnitPrice? DefaultUnitPrice { get; set; }
@@ -248,14 +280,20 @@ public sealed class Product
     [JsonPropertyName("shipment")]
     public ProductShipment? Shipment { get; set; }
 
+    [JsonPropertyName("dimensions")]
+    public ProductDimensions? Dimensions { get; set; }
+
+    [JsonPropertyName("unit_dimension")]
+    public string? UnitDimension { get; set; }
+
     [JsonPropertyName("media")]
-    public List<ProductMediaItem>? Media { get; set; }
+    public ProductMedia? Media { get; set; }
 
     [JsonPropertyName("attributes")]
-    public Dictionary<string, string>? Attributes { get; set; }
+    public List<ProductAttribute>? Attributes { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("active")]
     public bool? Active { get; set; }

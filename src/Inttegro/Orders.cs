@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Inttegro.BankAccounts;
 using Inttegro.Money;
@@ -37,7 +36,7 @@ public sealed class OrderPayoutFinancialAccount
     public BankAccountConfig? BankAccount { get; set; }
 
     [JsonPropertyName("dosh_account")]
-    public JsonObject? DoshAccount { get; set; }
+    public DoshAccount? DoshAccount { get; set; }
 }
 
 public sealed class OrderCreateRequest
@@ -86,7 +85,7 @@ public sealed class OrderCreateRequest
     public List<LineItemParams>? LineItems { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("billing_details")]
     public BillingDetails? BillingDetails { get; set; }
@@ -110,10 +109,10 @@ public sealed class OrderUpdateRequest
     public bool? ClearPaymentMethod { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("invoice_settings")]
-    public JsonObject? InvoiceSettings { get; set; }
+    public InvoiceSettings? InvoiceSettings { get; set; }
 
     [JsonPropertyName("finalize")]
     public bool? Finalize { get; set; }
@@ -138,6 +137,14 @@ public sealed class OrderUpdateRequest
 
     [JsonPropertyName("statement_descriptor_prefix")]
     public string? StatementDescriptorPrefix { get; set; }
+}
+
+public sealed class InvoiceSettings
+{
+    [JsonPropertyName("number")] public string? Number { get; set; }
+    [JsonPropertyName("memo")] public string? Memo { get; set; }
+    [JsonPropertyName("footer")] public string? Footer { get; set; }
+    [JsonPropertyName("custom_data")] public CustomData? CustomData { get; set; }
 }
 
 public sealed class OrderPayRequest
@@ -249,9 +256,6 @@ public sealed class OrderCustomer
 
     [JsonPropertyName("created_at")]
     public string? CreatedAt { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class OrderLineItemGroup
@@ -261,9 +265,6 @@ public sealed class OrderLineItemGroup
 
     [JsonPropertyName("total")]
     public Amount? Total { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class OrderInvoiceFormat
@@ -290,10 +291,7 @@ public sealed class OrderInvoice
     public OrderInvoiceFormat? Format { get; set; }
 
     [JsonPropertyName("deliveries")]
-    public List<JsonObject>? Deliveries { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
+    public List<OrderDocumentDeliveryAttempt>? Deliveries { get; set; }
 }
 
 public sealed class Order
@@ -320,7 +318,7 @@ public sealed class Order
     public OrderInvoice? Invoice { get; set; }
 
     [JsonPropertyName("shipping")]
-    public JsonObject? Shipping { get; set; }
+    public Shipping? Shipping { get; set; }
 
     [JsonPropertyName("initiated_at")]
     public string? InitiatedAt { get; set; }
@@ -333,9 +331,6 @@ public sealed class Order
 
     [JsonPropertyName("refunds")]
     public List<Refund>? Refunds { get; set; }
-
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? Extra { get; set; }
 }
 
 public sealed class OrderPage
@@ -377,7 +372,7 @@ public sealed class OrderDocumentDelivery
     public List<OrderDocumentDeliveryAttempt>? Deliveries { get; set; }
 
     [JsonPropertyName("failures")]
-    public List<OrderDocumentDeliveryAttempt>? Failures { get; set; }
+    public List<OrderDocumentDeliveryFailure>? Failures { get; set; }
 }
 
 public sealed class OrderDocumentDeliveryAttempt
@@ -387,6 +382,13 @@ public sealed class OrderDocumentDeliveryAttempt
 
     [JsonPropertyName("chime_id")]
     public string? ChimeId { get; set; }
+
+}
+
+public sealed class OrderDocumentDeliveryFailure
+{
+    [JsonPropertyName("channel")]
+    public string? Channel { get; set; }
 
     [JsonPropertyName("error")]
     public string? Error { get; set; }

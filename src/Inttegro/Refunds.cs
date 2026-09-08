@@ -61,7 +61,7 @@ public sealed class CreateRefundRequest
     public string? Reference { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("request_meta")]
     public RequestMeta? RequestMeta { get; set; }
@@ -139,7 +139,7 @@ public sealed class Refund
     public string? Reference { get; set; }
 
     [JsonPropertyName("custom_data")]
-    public Dictionary<string, string>? CustomData { get; set; }
+    public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("created_at")]
     public string? CreatedAt { get; set; }
