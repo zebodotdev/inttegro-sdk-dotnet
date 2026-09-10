@@ -9,9 +9,9 @@ public sealed class App
     [JsonPropertyName("alias")] public string? Alias { get; set; }
     [JsonPropertyName("description")] public string? Description { get; set; }
     [JsonPropertyName("legal_entity_type")] public string? LegalEntityType { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
-    [JsonPropertyName("updated_at")] public string? UpdatedAt { get; set; }
-    [JsonPropertyName("archived_at")] public string? ArchivedAt { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
+    [JsonPropertyName("updated_at")] public DateTimeOffset? UpdatedAt { get; set; }
+    [JsonPropertyName("archived_at")] public DateTimeOffset? ArchivedAt { get; set; }
     [JsonPropertyName("secret_key")] public GeneratedSecretKey? SecretKey { get; set; }
     [JsonPropertyName("relationship")] public AppRelationship? Relationship { get; set; }
 }
@@ -28,7 +28,7 @@ public sealed class AppRelationship
     [JsonPropertyName("child_app_id")] public string? ChildAppId { get; set; }
     [JsonPropertyName("child_standing")] public string? ChildStanding { get; set; }
     [JsonPropertyName("relationship_policy")] public AppRelationshipPolicy? RelationshipPolicy { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
 }
 
 public sealed class AppRelationshipPolicy
@@ -40,31 +40,21 @@ public sealed class AppRelationshipPolicy
 
 public sealed class BalanceAmount
 {
-    [JsonPropertyName("amount")] public long? Amount { get; set; }
+    [JsonPropertyName("amount")] public long Amount { get; set; }
 }
 
 public sealed class BalanceBreakdown
 {
-    [JsonPropertyName("available")] public BalanceAmount? Available { get; set; }
-    [JsonPropertyName("pending")] public BalanceAmount? Pending { get; set; }
-    [JsonPropertyName("reserved")] public BalanceAmount? Reserved { get; set; }
-    [JsonPropertyName("refund")] public BalanceAmount? Refund { get; set; }
-    [JsonPropertyName("includes_transactions_before")] public string? IncludesTransactionsBefore { get; set; }
+    [JsonPropertyName("available")] public BalanceAmount Available { get; set; } = null!;
+    [JsonPropertyName("pending")] public BalanceAmount Pending { get; set; } = null!;
+    [JsonPropertyName("reserved")] public BalanceAmount Reserved { get; set; } = null!;
+    [JsonPropertyName("refund")] public BalanceAmount Refund { get; set; } = null!;
+    [JsonPropertyName("includes_transactions_before")] public DateTimeOffset IncludesTransactionsBefore { get; set; } = null!;
 }
 
-[JsonConverter(typeof(BalanceSnapshotJsonConverter))]
-public sealed class BalanceSnapshot : IReadOnlyDictionary<string, BalanceBreakdown>
+public sealed class BalanceSnapshot
 {
-    private readonly Dictionary<string, BalanceBreakdown> _values = new();
-    internal IDictionary<string, BalanceBreakdown> MutableValues => _values;
-    public BalanceBreakdown this[string key] => _values[key];
-    public IEnumerable<string> Keys => _values.Keys;
-    public IEnumerable<BalanceBreakdown> Values => _values.Values;
-    public int Count => _values.Count;
-    public bool ContainsKey(string key) => _values.ContainsKey(key);
-    public bool TryGetValue(string key, out BalanceBreakdown value) => _values.TryGetValue(key, out value!);
-    public IEnumerator<KeyValuePair<string, BalanceBreakdown>> GetEnumerator() => _values.GetEnumerator();
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    [JsonPropertyName("ghs")] public BalanceBreakdown GHS { get; set; } = null!;
 }
 
 public sealed class BalanceTransactionPage
@@ -82,10 +72,10 @@ public sealed class Broadcast
     [JsonPropertyName("content")] public string? Content { get; set; }
     [JsonPropertyName("sender_id")] public string? SenderId { get; set; }
     [JsonPropertyName("purpose")] public string? Purpose { get; set; }
-    [JsonPropertyName("send_after")] public string? SendAfter { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
-    [JsonPropertyName("executed_at")] public string? ExecutedAt { get; set; }
-    [JsonPropertyName("canceled_at")] public string? CanceledAt { get; set; }
+    [JsonPropertyName("send_after")] public DateTimeOffset? SendAfter { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
+    [JsonPropertyName("executed_at")] public DateTimeOffset? ExecutedAt { get; set; }
+    [JsonPropertyName("canceled_at")] public DateTimeOffset? CanceledAt { get; set; }
     [JsonPropertyName("chime_ids")] public List<string>? ChimeIds { get; set; }
     [JsonPropertyName("errors")] public List<ApiError>? Errors { get; set; }
 }
@@ -93,7 +83,7 @@ public sealed class Broadcast
 public sealed class Chime
 {
     [JsonPropertyName("id")] public string? Id { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
     [JsonPropertyName("full_message")] public string? FullMessage { get; set; }
     [JsonPropertyName("sender_id")] public string? SenderId { get; set; }
     [JsonPropertyName("purpose")] public string? Purpose { get; set; }
@@ -146,9 +136,9 @@ public sealed class ChimeTransmission
     [JsonPropertyName("sender_id")] public string? SenderId { get; set; }
     [JsonPropertyName("sent_via")] public string? SentVia { get; set; }
     [JsonPropertyName("status")] public string? Status { get; set; }
-    [JsonPropertyName("sent_at")] public string? SentAt { get; set; }
-    [JsonPropertyName("delivered_at")] public string? DeliveredAt { get; set; }
-    [JsonPropertyName("failed_at")] public string? FailedAt { get; set; }
+    [JsonPropertyName("sent_at")] public DateTimeOffset? SentAt { get; set; }
+    [JsonPropertyName("delivered_at")] public DateTimeOffset? DeliveredAt { get; set; }
+    [JsonPropertyName("failed_at")] public DateTimeOffset? FailedAt { get; set; }
 }
 
 public sealed class ChimePage
@@ -166,10 +156,10 @@ public sealed class ScheduledChime
     [JsonPropertyName("full_message")] public string? FullMessage { get; set; }
     [JsonPropertyName("sender_id")] public string? SenderId { get; set; }
     [JsonPropertyName("purpose")] public string? Purpose { get; set; }
-    [JsonPropertyName("send_after")] public string? SendAfter { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
-    [JsonPropertyName("executed_at")] public string? ExecutedAt { get; set; }
-    [JsonPropertyName("canceled_at")] public string? CanceledAt { get; set; }
+    [JsonPropertyName("send_after")] public DateTimeOffset? SendAfter { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
+    [JsonPropertyName("executed_at")] public DateTimeOffset? ExecutedAt { get; set; }
+    [JsonPropertyName("canceled_at")] public DateTimeOffset? CanceledAt { get; set; }
     [JsonPropertyName("chime_ids")] public List<string>? ChimeIds { get; set; }
     [JsonPropertyName("errors")] public List<ApiError>? Errors { get; set; }
 }
@@ -187,10 +177,10 @@ public sealed class MessageTemplate
     [JsonPropertyName("email")] public MessageTemplateEmailContent? Email { get; set; }
     [JsonPropertyName("variables")] public List<MessageTemplateVariable>? Variables { get; set; }
     [JsonPropertyName("attachments")] public List<string>? Attachments { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
-    [JsonPropertyName("updated_at")] public string? UpdatedAt { get; set; }
-    [JsonPropertyName("published_at")] public string? PublishedAt { get; set; }
-    [JsonPropertyName("archived_at")] public string? ArchivedAt { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
+    [JsonPropertyName("updated_at")] public DateTimeOffset? UpdatedAt { get; set; }
+    [JsonPropertyName("published_at")] public DateTimeOffset? PublishedAt { get; set; }
+    [JsonPropertyName("archived_at")] public DateTimeOffset? ArchivedAt { get; set; }
 }
 
 public sealed class MessageTemplateSmsContent
@@ -289,9 +279,9 @@ public sealed class OtpTransaction
     [JsonPropertyName("id")] public string? Id { get; set; }
     [JsonPropertyName("status")] public string? Status { get; set; }
     [JsonPropertyName("full_message")] public string? FullMessage { get; set; }
-    [JsonPropertyName("initiated_at")] public string? InitiatedAt { get; set; }
-    [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
-    [JsonPropertyName("canceled_at")] public string? CanceledAt { get; set; }
+    [JsonPropertyName("initiated_at")] public DateTimeOffset? InitiatedAt { get; set; }
+    [JsonPropertyName("expires_at")] public DateTimeOffset? ExpiresAt { get; set; }
+    [JsonPropertyName("canceled_at")] public DateTimeOffset? CanceledAt { get; set; }
     [JsonPropertyName("cancel_reason")] public string? CancelReason { get; set; }
     [JsonPropertyName("transmission")] public ChimeTransmission? Transmission { get; set; }
 }
@@ -301,7 +291,7 @@ public sealed class OtpVerificationAttempt
     [JsonPropertyName("id")] public string? Id { get; set; }
     [JsonPropertyName("recipient")] public string? Recipient { get; set; }
     [JsonPropertyName("presented_token")] public string? PresentedToken { get; set; }
-    [JsonPropertyName("attempted_at")] public string? AttemptedAt { get; set; }
+    [JsonPropertyName("attempted_at")] public DateTimeOffset? AttemptedAt { get; set; }
     [JsonPropertyName("result")] public OtpVerificationAttemptResult? Result { get; set; }
 }
 
@@ -322,7 +312,7 @@ public sealed class GeneratedSecretKey
     [JsonPropertyName("id")] public string? Id { get; set; }
     [JsonPropertyName("label")] public string? Label { get; set; }
     [JsonPropertyName("token_type")] public string? TokenType { get; set; }
-    [JsonPropertyName("issued_at")] public string? IssuedAt { get; set; }
+    [JsonPropertyName("issued_at")] public DateTimeOffset? IssuedAt { get; set; }
     [JsonPropertyName("token")] public string? Token { get; set; }
 }
 
@@ -331,13 +321,13 @@ public sealed class SecretKey
     [JsonPropertyName("id")] public string? Id { get; set; }
     [JsonPropertyName("label")] public string? Label { get; set; }
     [JsonPropertyName("token_type")] public string? TokenType { get; set; }
-    [JsonPropertyName("issued_at")] public string? IssuedAt { get; set; }
-    [JsonPropertyName("updated_at")] public string? UpdatedAt { get; set; }
-    [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
+    [JsonPropertyName("issued_at")] public DateTimeOffset? IssuedAt { get; set; }
+    [JsonPropertyName("updated_at")] public DateTimeOffset? UpdatedAt { get; set; }
+    [JsonPropertyName("expires_at")] public DateTimeOffset? ExpiresAt { get; set; }
     [JsonPropertyName("status")] public string? Status { get; set; }
     [JsonPropertyName("active")] public bool? Active { get; set; }
-    [JsonPropertyName("revoked_at")] public string? RevokedAt { get; set; }
-    [JsonPropertyName("last_used_at")] public string? LastUsedAt { get; set; }
+    [JsonPropertyName("revoked_at")] public DateTimeOffset? RevokedAt { get; set; }
+    [JsonPropertyName("last_used_at")] public DateTimeOffset? LastUsedAt { get; set; }
     [JsonPropertyName("usage_count")] public int? UsageCount { get; set; }
 }
 
@@ -354,7 +344,7 @@ public sealed class SecretKeyPage
 public sealed class SecretKeyUsageRow
 {
     [JsonPropertyName("secret_key_id")] public string? SecretKeyId { get; set; }
-    [JsonPropertyName("occurred_at")] public string? OccurredAt { get; set; }
+    [JsonPropertyName("occurred_at")] public DateTimeOffset? OccurredAt { get; set; }
     [JsonPropertyName("auth_result")] public string? AuthResult { get; set; }
 }
 
@@ -384,9 +374,9 @@ public sealed class StoredFile
     [JsonPropertyName("filename")] public string? Filename { get; set; }
     [JsonPropertyName("content_type")] public string? ContentType { get; set; }
     [JsonPropertyName("size")] public long? Size { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
-    [JsonPropertyName("updated_at")] public string? UpdatedAt { get; set; }
-    [JsonPropertyName("deleted_at")] public string? DeletedAt { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
+    [JsonPropertyName("updated_at")] public DateTimeOffset? UpdatedAt { get; set; }
+    [JsonPropertyName("deleted_at")] public DateTimeOffset? DeletedAt { get; set; }
     [JsonPropertyName("title")] public string? Title { get; set; }
     [JsonPropertyName("custom_data")] public CustomData? CustomData { get; set; }
 }
@@ -403,9 +393,9 @@ public sealed class FileLink
     [JsonPropertyName("id")] public string? Id { get; set; }
     [JsonPropertyName("file_id")] public string? FileId { get; set; }
     [JsonPropertyName("status")] public string? Status { get; set; }
-    [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
-    [JsonPropertyName("revoked_at")] public string? RevokedAt { get; set; }
+    [JsonPropertyName("expires_at")] public DateTimeOffset? ExpiresAt { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
+    [JsonPropertyName("revoked_at")] public DateTimeOffset? RevokedAt { get; set; }
     [JsonPropertyName("custom_data")] public CustomData? CustomData { get; set; }
 }
 
@@ -434,9 +424,9 @@ public sealed class UploadRequest
     [JsonPropertyName("purpose")] public string? Purpose { get; set; }
     [JsonPropertyName("status")] public string? Status { get; set; }
     [JsonPropertyName("upload_url")] public string? UploadUrl { get; set; }
-    [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
-    [JsonPropertyName("canceled_at")] public string? CanceledAt { get; set; }
+    [JsonPropertyName("expires_at")] public DateTimeOffset? ExpiresAt { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
+    [JsonPropertyName("canceled_at")] public DateTimeOffset? CanceledAt { get; set; }
     [JsonPropertyName("custom_data")] public CustomData? CustomData { get; set; }
     [JsonPropertyName("metadata")] public FileMetadata? Metadata { get; set; }
     [JsonPropertyName("constraints")] public UploadRequestConstraints? Constraints { get; set; }
@@ -466,7 +456,7 @@ public sealed class UploadRequestAttempts
     [JsonPropertyName("max_attempts")] public int? MaxAttempts { get; set; }
     [JsonPropertyName("attempt_count")] public int? AttemptCount { get; set; }
     [JsonPropertyName("failed_attempt_count")] public int? FailedAttemptCount { get; set; }
-    [JsonPropertyName("last_attempted_at")] public string? LastAttemptedAt { get; set; }
+    [JsonPropertyName("last_attempted_at")] public DateTimeOffset? LastAttemptedAt { get; set; }
 }
 
 public sealed class UploadRequestPage
@@ -484,38 +474,24 @@ public sealed class UploadFulfillment
 
 public sealed class PaymentMethodVerificationSession
 {
-    [JsonPropertyName("payment_method_id")] public string? PaymentMethodId { get; set; }
-    [JsonPropertyName("status")] public string? Status { get; set; }
-    [JsonPropertyName("token_sent_at")] public string? TokenSentAt { get; set; }
-    [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
-    [JsonPropertyName("delivery")] public JsonData? Delivery { get; set; }
+    [JsonPropertyName("payment_method_id")] public string PaymentMethodId { get; set; } = string.Empty;
+    [JsonPropertyName("status")] public string Status { get; set; } = string.Empty;
+    [JsonPropertyName("token_sent_at")] public DateTimeOffset? TokenSentAt { get; set; }
+    [JsonPropertyName("expires_at")] public DateTimeOffset? ExpiresAt { get; set; }
+    [JsonPropertyName("delivery")] public PaymentMethodVerificationDelivery? Delivery { get; set; }
+}
+
+public sealed class PaymentMethodVerificationDelivery
+{
+    [JsonPropertyName("recipient")] public string? Recipient { get; set; }
+    [JsonPropertyName("channel")] public string? Channel { get; set; }
+    [JsonPropertyName("sender_id")] public string? SenderId { get; set; }
 }
 
 public sealed class PaymentMethodDeletion
 {
     [JsonPropertyName("deleted")] public bool? Deleted { get; set; }
     [JsonPropertyName("payment_method_id")] public string? PaymentMethodId { get; set; }
-}
-
-public sealed class PurchaseIntent
-{
-    [JsonPropertyName("id")] public string? Id { get; set; }
-    [JsonPropertyName("product_id")] public string? ProductId { get; set; }
-    [JsonPropertyName("price_id")] public string? PriceId { get; set; }
-    [JsonPropertyName("quantity")] public PurchaseIntentQuantity? Quantity { get; set; }
-    [JsonPropertyName("status")] public string? Status { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
-    [JsonPropertyName("updated_at")] public string? UpdatedAt { get; set; }
-    [JsonPropertyName("expires_at")] public string? ExpiresAt { get; set; }
-    [JsonPropertyName("product")] public Product? Product { get; set; }
-    [JsonPropertyName("price")] public PurchaseIntentPrice? Price { get; set; }
-}
-
-public sealed class PurchaseIntentPage
-{
-    [JsonPropertyName("number")] public int? Number { get; set; }
-    [JsonPropertyName("size")] public int? Size { get; set; }
-    [JsonPropertyName("purchase_intents")] public List<PurchaseIntent>? PurchaseIntents { get; set; }
 }
 
 public sealed class CountrySpecification

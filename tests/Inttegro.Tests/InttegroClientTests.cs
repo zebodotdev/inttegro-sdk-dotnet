@@ -40,6 +40,7 @@ public class InttegroClientTests
             "{\"id\":\"pr_123\",\"active\":true,\"nominal\":{\"currency\":\"ghs\",\"value\":3005},\"product_id\":\"prod_123\",\"created_at\":\"2026-09-02T12:00:00Z\"}"
         );
         Assert.Equal("prod_123", catalogPrice!.ProductId);
+        Assert.Equal(DateTimeOffset.Parse("2026-09-02T12:00:00Z"), catalogPrice.CreatedAt);
         Assert.Equal("\"mtn\"", networkJson);
         Assert.Equal("\"mobile_money\"", paymentMethodJson);
         Assert.Equal("\"requires_confirmation\"", paymentResultJson);
@@ -73,6 +74,24 @@ public class InttegroClientTests
     }
 
     [Fact]
+    public void PurchaseIntentExposesNestedResponseTypes()
+    {
+        const string json = """
+            {"activity":{"recent":[{"created_at":"2026-09-09T12:01:00Z","id":"saleevt_123","purchase_intent_id":"sale_123","type":"viewed","visitor":{"ip_address":"203.0.113.7"}}]},"allow_variants":false,"created_at":"2026-09-09T12:00:00Z","id":"sale_123","merchant":{"organization_name":"Tea House Ltd"},"product":{"active":true,"created_at":"2026-09-09T11:00:00Z","dimensions":{"digital":{"bytes":1024}},"id":"prod_123","name":"Tea guide","type":"digital"},"quantity":{"min":1},"status":"active","usage":{"order":{"created_at":"2026-09-09T12:02:00Z","id":"or_123"},"single_use":true}}
+            """;
+
+        var intent = JsonSerializer.Deserialize<PurchaseIntent>(json)!;
+
+        Assert.Equal("203.0.113.7", intent.Activity!.Recent![0].Visitor!.IpAddress);
+        Assert.Equal("Tea House Ltd", intent.Merchant!.OrganizationName);
+        Assert.Equal(1024, intent.Product!.Dimensions!.Digital!.Bytes);
+        Assert.Equal("or_123", intent.Usage.Order!.Id);
+        Assert.Equal(PurchaseIntentStatus.Active, intent.Status);
+        Assert.Equal(PurchaseIntentActivityType.Viewed, intent.Activity.Recent[0].Type);
+        Assert.Equal(DateTimeOffset.Parse("2026-09-09T12:00:00Z"), intent.CreatedAt);
+    }
+
+    [Fact]
     public void PaymentsDeserializeAsSemanticTypedObjects()
     {
         const string orderJson = """
@@ -96,7 +115,6 @@ public class InttegroClientTests
         var client = new InttegroClient("test", httpClient: httpClient);
 
         await client.Orders.CreateAsync(new { number = "1" });
-        await client.Orders.NewAsync(new { number = "2" });
         await client.Orders.LookupAsync("or_1");
         await client.Orders.UpdateAsync(new { order_id = "or_1", number = "ORDER-1" });
         await client.Orders.PayAsync(new { order_id = "or_1" });
@@ -122,7 +140,6 @@ public class InttegroClientTests
             ],
             RequestMeta = new RequestMeta { IdempotencyKey = "refund_order_alias_001" }
         };
-        await client.Orders.RefundAsync(refundRequest);
         await client.Orders.PageAsync(new { });
 
         await client.Refunds.CreateAsync(refundRequest);
@@ -259,12 +276,12 @@ public class InttegroClientTests
         await client.PurchaseIntents.CancelAsync("sale_1");
 
         await client.Spec.CountriesAsync();
-        await client.Balances.GetAsync();
+        var balance = await client.Balances.GetAsync();
+        Assert.Equal(1000, balance.GHS.Available.Amount);
 
         var expectedPaths = new[]
         {
             "/orders/create",
-            "/orders/new",
             "/orders/lookup",
             "/orders/update",
             "/orders/pay",
@@ -275,7 +292,6 @@ public class InttegroClientTests
             "/orders/send_receipt",
             "/orders/complete",
             "/orders/cancel",
-            "/orders/refund",
             "/orders/page",
             "/refunds/create",
             "/refunds/cancel",
@@ -376,7 +392,7 @@ public class InttegroClientTests
     }
 
     [Fact]
-    public async Task RefundCreateAndOrderAliasShareTheSameContract()
+    public async Task RefundCreateUsesTheTypedContract()
     {
         var handler = new RecordingHandler
         {
@@ -406,14 +422,10 @@ public class InttegroClientTests
         };
 
         var canonical = await client.Refunds.CreateAsync(payload);
-        var alias = await client.Orders.RefundAsync(payload);
-
         Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", canonical.Id);
-        Assert.Equal("rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd", alias.Id);
         Assert.Equal(RefundStatus.Pending, canonical.Status);
         Assert.Equal(RefundReason.ItemReturned, canonical.Reason);
-        Assert.Equal(new[] { "/refunds/create", "/orders/refund" }, handler.Requests.Select(r => r.RequestUri!.AbsolutePath));
-        Assert.True(JsonNode.DeepEquals(JsonNode.Parse(handler.Bodies[0]), JsonNode.Parse(handler.Bodies[1])));
+        Assert.Equal(new[] { "/refunds/create" }, handler.Requests.Select(r => r.RequestUri!.AbsolutePath));
         using var request = JsonDocument.Parse(handler.Bodies[0]);
         Assert.Equal("oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN", request.RootElement.GetProperty("line_items")[0].GetProperty("order_line_item_id").GetString());
         Assert.Equal(2500L, request.RootElement.GetProperty("line_items")[0].GetProperty("refund_amount").GetProperty("value").GetInt64());
@@ -669,7 +681,6 @@ public class InttegroClientTests
 
         private static string DefaultResponseBody(string path) => path switch
         {
-            "/orders/refund" => "{\"refund\":{\"id\":\"rf_123\"}}",
             "/orders/page" => "{\"page\":{\"number\":0,\"size\":0,\"orders\":[]}}",
             "/orders/send_invoice" or "/orders/send_receipt" => "{}",
             var value when value.StartsWith("/orders/", StringComparison.Ordinal) => "{\"order\":{\"id\":\"or_123\"}}",
@@ -718,7 +729,7 @@ public class InttegroClientTests
             "/purchase_intents/page" => "{\"page\":{}}",
             var value when value.StartsWith("/purchase_intents/", StringComparison.Ordinal) => "{\"purchase_intent\":{}}",
             "/spec/countries" => "{\"countries\":{}}",
-            "/balances" => "{\"balances\":{}}",
+            "/balances" => "{\"balances\":{\"ghs\":{\"available\":{\"amount\":1000},\"pending\":{\"amount\":200},\"reserved\":{\"amount\":100},\"refund\":{\"amount\":50},\"includes_transactions_before\":\"2026-09-09T12:00:00Z\"}}}",
 
             "/files/page" or "/file_links/page" or "/upload_requests/page" or "/message_templates/page" => "{\"page\":{}}",
             var value when value.StartsWith("/files/", StringComparison.Ordinal) => "{\"file\":{}}",

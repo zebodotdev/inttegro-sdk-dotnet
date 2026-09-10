@@ -31,7 +31,9 @@ public enum LineItemType
     [EnumMember(Value = "fee")]
     Fee,
     [EnumMember(Value = "shipping")]
-    Shipping
+    Shipping,
+    [EnumMember(Value = "discount")]
+    Discount
 }
 
 public sealed class RequestMeta
@@ -170,7 +172,12 @@ public sealed class LineItem
 
     [JsonPropertyName("shipping")]
     public ShippingDetails? Shipping { get; set; }
+
+    [JsonPropertyName("discount")]
+    public DiscountDetails? Discount { get; set; }
 }
+
+public sealed class DiscountDetails { }
 
 public sealed class ProductDetailsParams
 {
@@ -208,25 +215,34 @@ public sealed class ProductDetailsParams
 public sealed class ProductDetails
 {
     [JsonPropertyName("id")]
-    public string? Id { get; set; }
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("product_id")]
+    public string? ProductId { get; set; }
+
+    [JsonPropertyName("price_id")]
+    public string? PriceId { get; set; }
 
     [JsonPropertyName("type")]
     public ProductType Type { get; set; }
 
     [JsonPropertyName("name")]
-    public string? Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("about")]
     public string? About { get; set; }
 
     [JsonPropertyName("quantity")]
-    public long? Quantity { get; set; }
+    public long Quantity { get; set; }
 
     [JsonPropertyName("price")]
-    public Price? Price { get; set; }
+    public Price Price { get; set; } = new();
 
     [JsonPropertyName("reference")]
     public string? Reference { get; set; }
+
+    [JsonPropertyName("category")]
+    public string? Category { get; set; }
 
     [JsonPropertyName("tax_code")]
     public string? TaxCode { get; set; }
@@ -259,10 +275,10 @@ public sealed class FeeDetailsParams
 public sealed class FeeDetails
 {
     [JsonPropertyName("id")]
-    public string? Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     [JsonPropertyName("label")]
-    public string? Label { get; set; }
+    public string Label { get; set; } = string.Empty;
 
     [JsonPropertyName("tax_code")]
     public string? TaxCode { get; set; }
@@ -270,11 +286,8 @@ public sealed class FeeDetails
     [JsonPropertyName("description")]
     public string? Description { get; set; }
 
-    [JsonPropertyName("custom_data")]
-    public CustomData? CustomData { get; set; }
-
     [JsonPropertyName("amount")]
-    public Amount? Amount { get; set; }
+    public Amount Amount { get; set; } = new();
 }
 
 public sealed class ShippingDetailsParams
@@ -295,14 +308,14 @@ public sealed class ShippingDetailsParams
 public sealed class ShippingDetails
 {
     [JsonPropertyName("id")]
-    public string? Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     [JsonPropertyName("tax_code")]
     public string? TaxCode { get; set; }
 
-    [JsonPropertyName("custom_data")]
-    public CustomData? CustomData { get; set; }
+    [JsonPropertyName("label")]
+    public string? Label { get; set; }
 
     [JsonPropertyName("fee")]
-    public Amount? Fee { get; set; }
+    public Amount Fee { get; set; } = new();
 }

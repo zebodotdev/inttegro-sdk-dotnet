@@ -142,19 +142,19 @@ public sealed class Refund
     public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("created_at")]
-    public string? CreatedAt { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
 
     [JsonPropertyName("processing_at")]
-    public string? ProcessingAt { get; set; }
+    public DateTimeOffset? ProcessingAt { get; set; }
 
     [JsonPropertyName("succeeded_at")]
-    public string? SucceededAt { get; set; }
+    public DateTimeOffset? SucceededAt { get; set; }
 
     [JsonPropertyName("failed_at")]
-    public string? FailedAt { get; set; }
+    public DateTimeOffset? FailedAt { get; set; }
 
     [JsonPropertyName("canceled_at")]
-    public string? CanceledAt { get; set; }
+    public DateTimeOffset? CanceledAt { get; set; }
 }
 
 public sealed class RefundPage

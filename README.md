@@ -111,7 +111,7 @@ var refund = await inttegro.Refunds.CreateAsync(new CreateRefundRequest
 Console.WriteLine($"{refund.Id} {refund.Status} {refund.Total?.Value}");
 ```
 
-Use `Refunds.CancelAsync`, `Refunds.LookupAsync`, and `Refunds.PageAsync` to manage the refund lifecycle. `Orders.RefundAsync` remains a compatibility alias and returns the created `Refund` directly.
+Use `Refunds.CreateAsync`, `Refunds.CancelAsync`, `Refunds.LookupAsync`, and `Refunds.PageAsync` to manage the refund lifecycle.
 
 ## Observe SDK operations
 

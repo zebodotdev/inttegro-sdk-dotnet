@@ -303,11 +303,6 @@ internal sealed class ProductDimensionDetailsJsonConverter : SemanticDictionaryJ
     protected override void Add(ProductDimensionDetails collection, string key, string value) => collection.Set(key, value);
 }
 
-internal sealed class BalanceSnapshotJsonConverter : SemanticDictionaryJsonConverter<BalanceSnapshot, BalanceBreakdown>
-{
-    protected override IDictionary<string, BalanceBreakdown> Values(BalanceSnapshot collection) => collection.MutableValues;
-}
-
 internal sealed class CountrySpecificationsJsonConverter : SemanticDictionaryJsonConverter<CountrySpecifications, CountrySpecification>
 {
     protected override IDictionary<string, CountrySpecification> Values(CountrySpecifications collection) => collection.MutableValues;

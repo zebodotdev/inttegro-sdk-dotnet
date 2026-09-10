@@ -52,6 +52,9 @@ public sealed class PurchaseIntentUsage
 
     [JsonPropertyName("multi_use")]
     public bool? MultiUse { get; set; }
+
+    [JsonPropertyName("order")]
+    public PurchaseIntentUsageOrder? Order { get; set; }
 }
 
 public sealed class CreatePurchaseIntentParams
@@ -75,7 +78,7 @@ public sealed class CreatePurchaseIntentParams
     public PurchaseIntentUsage? Usage { get; set; }
 
     [JsonPropertyName("expires_at")]
-    public string? ExpiresAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
 }
 
 public sealed class PurchaseIntentOriginalPrice
@@ -90,7 +93,7 @@ public sealed class PurchaseIntentOriginalPrice
     public string? Label { get; set; }
 
     [JsonPropertyName("nominal")]
-    public Amount? Nominal { get; set; }
+    public Amount Nominal { get; set; } = null!;
 }
 
 public sealed class PurchaseIntentPrice
@@ -105,7 +108,7 @@ public sealed class PurchaseIntentPrice
     public string? Label { get; set; }
 
     [JsonPropertyName("nominal")]
-    public Amount? Nominal { get; set; }
+    public Amount Nominal { get; set; } = null!;
 
     [JsonPropertyName("original")]
     public PurchaseIntentOriginalPrice? Original { get; set; }

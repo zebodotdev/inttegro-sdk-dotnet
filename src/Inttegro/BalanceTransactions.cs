@@ -42,18 +42,17 @@ public class BalanceTransaction
     public Amount Amount { get; set; } = new();
 
     [JsonPropertyName("created_at")]
-    public string CreatedAt { get; set; } = string.Empty;
+    public DateTimeOffset CreatedAt { get; set; };
 
     [JsonPropertyName("available_at")]
-    public string? AvailableAt { get; set; }
+    public DateTimeOffset? AvailableAt { get; set; }
 
     [JsonPropertyName("claimed_at")]
-    public string? ClaimedAt { get; set; }
+    public DateTimeOffset? ClaimedAt { get; set; }
 
     [JsonPropertyName("paid_at")]
-    public string? PaidAt { get; set; }
+    public DateTimeOffset? PaidAt { get; set; }
 
-    [Obsolete("The reviewed API does not return payout_configuration on balance transactions.")]
     [JsonPropertyName("payout_configuration")]
     public PayoutConfiguration? PayoutConfiguration { get; set; }
 
@@ -64,9 +63,4 @@ public class BalanceTransaction
         BalanceTransactionType.Refund when !string.IsNullOrWhiteSpace(RefundId) && PaymentId is null => RefundId,
         _ => null
     };
-}
-
-[Obsolete("Use BalanceTransaction. Order responses now reuse the canonical model.")]
-public sealed class OrderBalanceTransaction : BalanceTransaction
-{
 }

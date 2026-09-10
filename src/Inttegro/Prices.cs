@@ -79,13 +79,13 @@ public sealed class CatalogPrice
     public Product? Product { get; set; }
 
     [JsonPropertyName("created_at")]
-    public string? CreatedAt { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
 
     [JsonPropertyName("updated_at")]
-    public string? UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
 
     [JsonPropertyName("archived_at")]
-    public string? ArchivedAt { get; set; }
+    public DateTimeOffset? ArchivedAt { get; set; }
 }
 
 public sealed class PricePage
