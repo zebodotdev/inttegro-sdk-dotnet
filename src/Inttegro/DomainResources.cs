@@ -49,7 +49,7 @@ public sealed class BalanceBreakdown
     [JsonPropertyName("pending")] public BalanceAmount Pending { get; set; } = null!;
     [JsonPropertyName("reserved")] public BalanceAmount Reserved { get; set; } = null!;
     [JsonPropertyName("refund")] public BalanceAmount Refund { get; set; } = null!;
-    [JsonPropertyName("includes_transactions_before")] public DateTimeOffset IncludesTransactionsBefore { get; set; } = null!;
+    [JsonPropertyName("includes_transactions_before")] public DateTimeOffset IncludesTransactionsBefore { get; set; }
 }
 
 public sealed class BalanceSnapshot

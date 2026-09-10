@@ -7,7 +7,7 @@ public sealed class PurchaseIntent
 {
     [JsonPropertyName("activity")] public PurchaseIntentActivityLog? Activity { get; set; }
     [JsonPropertyName("allow_variants")] public bool AllowVariants { get; set; }
-    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; } = null!;
+    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; }
     [JsonPropertyName("expires_at")] public DateTimeOffset? ExpiresAt { get; set; }
     [JsonPropertyName("id")] public string Id { get; set; } = null!;
     [JsonPropertyName("inactive_at")] public DateTimeOffset? InactiveAt { get; set; }
@@ -30,7 +30,7 @@ public sealed class PurchaseIntentActivity
 {
     [JsonPropertyName("amount")] public Amount? Amount { get; set; }
     [JsonPropertyName("attribution")] public PurchaseIntentActivityAttribution? Attribution { get; set; }
-    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; } = null!;
+    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; }
     [JsonPropertyName("error_code")] public string? ErrorCode { get; set; }
     [JsonPropertyName("id")] public string Id { get; set; } = null!;
     [JsonPropertyName("order_id")] public string? OrderId { get; set; }
@@ -87,7 +87,7 @@ public sealed class PurchaseIntentProduct
     [JsonPropertyName("archived_at")] public DateTimeOffset? ArchivedAt { get; set; }
     [JsonPropertyName("attributes")] public List<ProductAttribute>? Attributes { get; set; }
     [JsonPropertyName("category")] public string? Category { get; set; }
-    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; } = null!;
+    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; }
     [JsonPropertyName("custom_data")] public CustomData? CustomData { get; set; }
     [JsonPropertyName("description")] public string? Description { get; set; }
     [JsonPropertyName("dimensions")] public ProductDimensions? Dimensions { get; set; }
@@ -106,7 +106,7 @@ public sealed class PurchaseIntentProduct
 
 public sealed class PurchaseIntentUsageOrder
 {
-    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; } = null!;
+    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; }
     [JsonPropertyName("id")] public string Id { get; set; } = null!;
 }
 

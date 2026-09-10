@@ -18,11 +18,6 @@ public class OpenApiCoverageTests
         "/checkout/request_confirmation",
         "/checkout/confirm_payment"
     ];
-    private static readonly string[] LegacyCompatibilityOperations =
-    [
-        "/orders/refund"
-    ];
-
     [Fact]
     public void SdkImplementsEveryPublicOpenApiPath()
     {
@@ -30,7 +25,6 @@ public class OpenApiCoverageTests
         var implementedPaths = LoadImplementedPaths(FindSdkRoot());
         var exceptions = CapabilityUrlOperations
             .Concat(ClientCheckoutOperations)
-            .Concat(LegacyCompatibilityOperations)
             .ToHashSet(StringComparer.Ordinal);
 
         var missing = openApiPaths
