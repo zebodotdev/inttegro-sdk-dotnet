@@ -135,7 +135,7 @@ public sealed class PaymentAttempt
     public PaymentAttemptStatus Status { get; set; }
 
     [JsonPropertyName("initiated_at")]
-    public DateTimeOffset InitiatedAt { get; set; };
+    public DateTimeOffset InitiatedAt { get; set; }
 
     [JsonPropertyName("succeeded_at")]
     public DateTimeOffset? SucceededAt { get; set; }
@@ -158,12 +158,12 @@ public sealed class PaymentConfirmationAttempt
     [JsonPropertyName("confirmed")] public bool Confirmed { get; set; }
     [JsonPropertyName("reason")] public string Reason { get; set; } = string.Empty;
     [JsonPropertyName("executed_at")] public DateTimeOffset? ExecutedAt { get; set; }
-    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; };
+    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; }
 }
 
 public sealed class PaymentConfirmAction
 {
-    [JsonPropertyName("expires_at")] public DateTimeOffset ExpiresAt { get; set; };
+    [JsonPropertyName("expires_at")] public DateTimeOffset ExpiresAt { get; set; }
     [JsonPropertyName("scheme")] public string Scheme { get; set; } = string.Empty;
     [JsonPropertyName("request")] public PaymentConfirmationRequest? Request { get; set; }
     [JsonPropertyName("attempt")] public PaymentConfirmationAttempt? Attempt { get; set; }
@@ -175,13 +175,13 @@ public sealed class PaymentRedirectVisit
 {
     [JsonPropertyName("user_agent")] public string UserAgent { get; set; } = string.Empty;
     [JsonPropertyName("ip_address")] public string IpAddress { get; set; } = string.Empty;
-    [JsonPropertyName("at")] public DateTimeOffset At { get; set; };
+    [JsonPropertyName("at")] public DateTimeOffset At { get; set; }
 }
 
 public sealed class PaymentRedirectAction
 {
     [JsonPropertyName("redirect_url")] public string RedirectUrl { get; set; } = string.Empty;
-    [JsonPropertyName("valid_until")] public DateTimeOffset ValidUntil { get; set; };
+    [JsonPropertyName("valid_until")] public DateTimeOffset ValidUntil { get; set; }
     [JsonPropertyName("latest_visit")] public PaymentRedirectVisit? LatestVisit { get; set; }
 }
 
@@ -189,7 +189,7 @@ public sealed class PaymentAuthorizeAction
 {
     [JsonPropertyName("beneficiary")] public string Beneficiary { get; set; } = string.Empty;
     [JsonPropertyName("scheme")] public string Scheme { get; set; } = string.Empty;
-    [JsonPropertyName("expires_at")] public DateTimeOffset ExpiresAt { get; set; };
+    [JsonPropertyName("expires_at")] public DateTimeOffset ExpiresAt { get; set; }
 }
 
 public sealed class PaymentRequestConfirmationAction
@@ -265,7 +265,7 @@ public sealed class PaymentMethodSnapshot
     [JsonPropertyName("id")] public string Id { get; set; } = string.Empty;
     [JsonPropertyName("bank_account")] public PaymentMethodSnapshotBankAccount? BankAccount { get; set; }
     [JsonPropertyName("card")] public PaymentMethodSnapshotCard? Card { get; set; }
-    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; };
+    [JsonPropertyName("created_at")] public DateTimeOffset CreatedAt { get; set; }
     [JsonPropertyName("customer_id")] public string CustomerId { get; set; } = string.Empty;
     [JsonPropertyName("mobile_money")] public PaymentMethodSnapshotMobileMoney? MobileMoney { get; set; }
     [JsonPropertyName("owner")] public PaymentMethodSnapshotOwner? Owner { get; set; }
@@ -303,7 +303,7 @@ public sealed class Payment
     [JsonPropertyName("balance_transaction")] public BalanceTransaction? BalanceTransaction { get; set; }
     [JsonPropertyName("payout_configuration")] public PayoutConfiguration? PayoutConfiguration { get; set; }
     [JsonPropertyName("status")] public PaymentStatus Status { get; set; }
-    [JsonPropertyName("initiated_at")] public DateTimeOffset InitiatedAt { get; set; };
+    [JsonPropertyName("initiated_at")] public DateTimeOffset InitiatedAt { get; set; }
     [JsonPropertyName("executed_at")] public DateTimeOffset? ExecutedAt { get; set; }
     [JsonPropertyName("due_at")] public DateTimeOffset? DueAt { get; set; }
     [JsonPropertyName("canceled_at")] public DateTimeOffset? CanceledAt { get; set; }

@@ -88,7 +88,7 @@ public sealed class PaymentMethodVerification
     public DateTimeOffset? CompletedAt { get; set; }
 
     [JsonPropertyName("initiated_at")]
-    public DateTimeOffset InitiatedAt { get; set; };
+    public DateTimeOffset InitiatedAt { get; set; }
 
     [JsonPropertyName("mechanism")]
     public string? Mechanism { get; set; }
@@ -125,7 +125,7 @@ public sealed class PaymentMethodSupplied
     [JsonPropertyName("channel")] public string? Channel { get; set; }
     [JsonPropertyName("resource_id")] public string? ResourceId { get; set; }
     [JsonPropertyName("resource_type")] public string? ResourceType { get; set; }
-    [JsonPropertyName("supplied_at")] public DateTimeOffset SuppliedAt { get; set; };
+    [JsonPropertyName("supplied_at")] public DateTimeOffset SuppliedAt { get; set; }
 }
 
 public sealed class PaymentMethodData
@@ -290,7 +290,7 @@ public sealed class PaymentMethod
     public bool? Ephemeral { get; set; }
 
     [JsonPropertyName("created_at")]
-    public DateTimeOffset CreatedAt { get; set; };
+    public DateTimeOffset CreatedAt { get; set; }
 
     [JsonPropertyName("verified_at")]
     public DateTimeOffset? VerifiedAt { get; set; }

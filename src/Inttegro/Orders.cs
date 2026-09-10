@@ -357,7 +357,7 @@ public sealed class Order
     public OrderCreatedFrom? CreatedFrom { get; set; }
 
     [JsonPropertyName("initiated_at")]
-    public DateTimeOffset InitiatedAt { get; set; };
+    public DateTimeOffset InitiatedAt { get; set; }
 
     [JsonPropertyName("sealed_at")]
     public DateTimeOffset? SealedAt { get; set; }

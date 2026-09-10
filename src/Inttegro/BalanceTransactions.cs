@@ -42,7 +42,7 @@ public class BalanceTransaction
     public Amount Amount { get; set; } = new();
 
     [JsonPropertyName("created_at")]
-    public DateTimeOffset CreatedAt { get; set; };
+    public DateTimeOffset CreatedAt { get; set; }
 
     [JsonPropertyName("available_at")]
     public DateTimeOffset? AvailableAt { get; set; }
