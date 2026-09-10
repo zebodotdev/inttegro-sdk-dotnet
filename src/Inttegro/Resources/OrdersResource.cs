@@ -19,15 +19,6 @@ public class OrdersResource
         return PostOrderAsync("/orders/create", payload, cancellationToken);
     }
 
-    public Task<Order> NewAsync(object payload, CancellationToken cancellationToken = default) =>
-        PostOrderAsync("/orders/new", payload, cancellationToken);
-
-    public Task<Order> NewAsync(OrderCreateRequest payload, CancellationToken cancellationToken = default)
-    {
-        ValidateCreate(payload);
-        return PostOrderAsync("/orders/new", payload, cancellationToken);
-    }
-
     public Task<Order> UpdateAsync(object payload, CancellationToken cancellationToken = default) =>
         PostOrderAsync("/orders/update", payload, cancellationToken);
 
@@ -133,30 +124,6 @@ public class OrdersResource
     {
         RequestValidator.Require(payload.OrderId, "order_id");
         return PostOrderAsync("/orders/cancel", payload, cancellationToken);
-    }
-
-    /// <summary>
-    /// Creates a refund through the compatibility route. New integrations should use Refunds.CreateAsync.
-    /// </summary>
-    [Obsolete("Use Refunds.CreateAsync for new integrations.")]
-    public Task<Refund> RefundAsync(CreateRefundRequest payload, CancellationToken cancellationToken = default)
-        => RefundAsync(payload, idempotencyKey: null, cancellationToken);
-
-    [Obsolete("Use Refunds.CreateAsync for new integrations.")]
-    public async Task<Refund> RefundAsync(
-        CreateRefundRequest payload,
-        string? idempotencyKey,
-        CancellationToken cancellationToken = default
-    )
-    {
-        RefundsResource.ValidateCreate(payload);
-        return await _client.PostResourceWithHeadersAsync<Refund>(
-            "/orders/refund",
-            "refund",
-            payload,
-            RefundsResource.IdempotencyHeaders(idempotencyKey),
-            cancellationToken
-        );
     }
 
     public Task<OrderPage> PageAsync(object? payload = null, CancellationToken cancellationToken = default) =>

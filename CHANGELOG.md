@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [7.0.0] - 2026-09-10
+
+- Breaking: replaced generic dictionaries with named models for balances, purchase intents, products, payment methods, payments, and orders.
+- Breaking: exposed API timestamps as `DateTimeOffset` values and accepted them in timestamp request objects.
+
 ## [6.2.0] - 2026-09-06
 
 - Added opt-in, typed error reporting to application-owned collectors with privacy-safe payloads, stable fingerprints, isolated reporter failures, and no reporting work when unconfigured.

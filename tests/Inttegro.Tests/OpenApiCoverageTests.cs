@@ -18,7 +18,6 @@ public class OpenApiCoverageTests
         "/checkout/request_confirmation",
         "/checkout/confirm_payment"
     ];
-
     [Fact]
     public void SdkImplementsEveryPublicOpenApiPath()
     {

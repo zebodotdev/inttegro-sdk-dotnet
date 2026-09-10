@@ -21,31 +21,34 @@ public sealed class ProductDefaultUnitPrice
     public Amount? Nominal { get; set; }
 
     [JsonPropertyName("created_at")]
-    public string? CreatedAt { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
 
     [JsonPropertyName("updated_at")]
-    public string? UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
 
     [JsonPropertyName("archived_at")]
-    public string? ArchivedAt { get; set; }
+    public DateTimeOffset? ArchivedAt { get; set; }
 }
 
 public sealed class ProductPriceSummary
 {
     [JsonPropertyName("id")]
-    public string? Id { get; set; }
+    public string Id { get; set; } = null!;
 
     [JsonPropertyName("label")]
     public string? Label { get; set; }
 
+    [JsonPropertyName("active")]
+    public bool Active { get; set; }
+
     [JsonPropertyName("nominal")]
-    public Amount? Nominal { get; set; }
+    public Amount Nominal { get; set; } = null!;
 }
 
 public sealed class ProductAttribute
 {
-    [JsonPropertyName("name")] public string? Name { get; set; }
-    [JsonPropertyName("value")] public string? Value { get; set; }
+    [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
+    [JsonPropertyName("value")] public string Value { get; set; } = string.Empty;
 }
 
 public sealed class ProductPhysicalDimensions
@@ -96,13 +99,19 @@ public sealed class ProductMedia
 
 public sealed class ProductShipment
 {
-    [JsonPropertyName("type")] public string? Type { get; set; }
-    [JsonPropertyName("delivery")] public JsonData? Delivery { get; set; }
-    [JsonPropertyName("download")] public JsonData? Download { get; set; }
-    [JsonPropertyName("render")] public JsonData? Render { get; set; }
-    [JsonPropertyName("service")] public JsonData? Service { get; set; }
-    [JsonPropertyName("stream")] public JsonData? Stream { get; set; }
+    [JsonPropertyName("type")] public ProductShipmentType Type { get; set; }
+    [JsonPropertyName("delivery")] public ProductDelivery? Delivery { get; set; }
+    [JsonPropertyName("download")] public ProductDownload? Download { get; set; }
+    [JsonPropertyName("render")] public ProductRender? Render { get; set; }
+    [JsonPropertyName("service")] public ProductService? Service { get; set; }
+    [JsonPropertyName("stream")] public ProductStream? Stream { get; set; }
 }
+
+public sealed class ProductDelivery { }
+public sealed class ProductDownload { }
+public sealed class ProductRender { }
+public sealed class ProductService { }
+public sealed class ProductStream { }
 
 public sealed class CreateProductRequest
 {
@@ -245,10 +254,7 @@ public sealed class PageProductsRequest
 public sealed class Product
 {
     [JsonPropertyName("id")]
-    public string? Id { get; set; }
-
-    [JsonPropertyName("application_id")]
-    public string? ApplicationId { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     [JsonPropertyName("type")]
     public ProductType Type { get; set; }
@@ -257,7 +263,7 @@ public sealed class Product
     public string? Reference { get; set; }
 
     [JsonPropertyName("name")]
-    public string? Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("description")]
     public string? Description { get; set; }
@@ -271,9 +277,6 @@ public sealed class Product
     [JsonPropertyName("category")]
     public string? Category { get; set; }
 
-    [JsonPropertyName("default_unit_price")]
-    public ProductDefaultUnitPrice? DefaultUnitPrice { get; set; }
-
     [JsonPropertyName("prices")]
     public List<ProductPriceSummary>? Prices { get; set; }
 
@@ -283,8 +286,8 @@ public sealed class Product
     [JsonPropertyName("dimensions")]
     public ProductDimensions? Dimensions { get; set; }
 
-    [JsonPropertyName("unit_dimension")]
-    public string? UnitDimension { get; set; }
+    [JsonPropertyName("unit_dim")]
+    public string? UnitDim { get; set; }
 
     [JsonPropertyName("media")]
     public ProductMedia? Media { get; set; }
@@ -296,29 +299,29 @@ public sealed class Product
     public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("active")]
-    public bool? Active { get; set; }
-
-    [JsonPropertyName("archived")]
-    public bool? Archived { get; set; }
+    public bool Active { get; set; }
 
     [JsonPropertyName("created_at")]
-    public string? CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
     [JsonPropertyName("updated_at")]
-    public string? UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
 
     [JsonPropertyName("archived_at")]
-    public string? ArchivedAt { get; set; }
+    public DateTimeOffset? ArchivedAt { get; set; }
+
+    [JsonPropertyName("published_at")]
+    public DateTimeOffset? PublishedAt { get; set; }
 }
 
 public sealed class ProductPage
 {
     [JsonPropertyName("number")]
-    public int? Number { get; set; }
+    public int Number { get; set; }
 
     [JsonPropertyName("size")]
-    public int? Size { get; set; }
+    public int Size { get; set; }
 
     [JsonPropertyName("products")]
-    public List<Product>? Products { get; set; }
+    public List<Product> Products { get; set; } = [];
 }

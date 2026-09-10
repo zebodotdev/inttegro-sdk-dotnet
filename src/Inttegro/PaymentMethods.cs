@@ -44,10 +44,13 @@ public sealed class MobileMoney
 public sealed class PaymentMethodMobileMoney
 {
     [JsonPropertyName("account_number")]
-    public string? AccountNumber { get; set; }
+    public string AccountNumber { get; set; } = string.Empty;
+
+    [JsonPropertyName("last4")]
+    public string Last4 { get; set; } = string.Empty;
 
     [JsonPropertyName("network")]
-    public string? Network { get; set; }
+    public MobileMoneyNetwork Network { get; set; }
 }
 
 public sealed class PaymentMethodBankAccountGhana
@@ -59,7 +62,7 @@ public sealed class PaymentMethodBankAccountGhana
     public string? Name { get; set; }
 
     [JsonPropertyName("account_number")]
-    public string? AccountNumber { get; set; }
+    public string AccountNumber { get; set; } = string.Empty;
 
     [JsonPropertyName("sort_code")]
     public string? SortCode { get; set; }
@@ -74,70 +77,55 @@ public sealed class PaymentMethodBankAccount
     public PaymentMethodBankAccountGhana? GhanaBankAccount { get; set; }
 
     [JsonPropertyName("type")]
-    public string? Type { get; set; }
+    public string Type { get; set; } = string.Empty;
 }
 
-public sealed class PaymentMethodCardIssuer
-{
-    [JsonPropertyName("email_address")]
-    public string? EmailAddress { get; set; }
-
-    [JsonPropertyName("name")]
-    public string? Name { get; set; }
-
-    [JsonPropertyName("phone_number")]
-    public string? PhoneNumber { get; set; }
-
-    [JsonPropertyName("type")]
-    public string? Type { get; set; }
-}
-
-public sealed class PaymentMethodCardOwner
-{
-    [JsonPropertyName("email_address")]
-    public string? EmailAddress { get; set; }
-
-    [JsonPropertyName("name")]
-    public string? Name { get; set; }
-
-    [JsonPropertyName("phone_number")]
-    public string? PhoneNumber { get; set; }
-}
-
-public sealed class PaymentMethodCard
-{
-    [JsonPropertyName("brand")]
-    public string? Brand { get; set; }
-
-    [JsonPropertyName("expires_on")]
-    public string? ExpiresOn { get; set; }
-
-    [JsonPropertyName("issuer")]
-    public PaymentMethodCardIssuer? Issuer { get; set; }
-
-    [JsonPropertyName("owner")]
-    public PaymentMethodCardOwner? Owner { get; set; }
-
-    [JsonPropertyName("type")]
-    public string? Type { get; set; }
-}
+public sealed class PaymentMethodCard { }
 
 public sealed class PaymentMethodVerification
 {
     [JsonPropertyName("completed_at")]
-    public string? CompletedAt { get; set; }
+    public DateTimeOffset? CompletedAt { get; set; }
 
     [JsonPropertyName("initiated_at")]
-    public string? InitiatedAt { get; set; }
+    public DateTimeOffset InitiatedAt { get; set; }
 
     [JsonPropertyName("mechanism")]
     public string? Mechanism { get; set; }
 
     [JsonPropertyName("request_id")]
-    public string? RequestId { get; set; }
+    public string RequestId { get; set; } = string.Empty;
 
     [JsonPropertyName("type")]
-    public string? Type { get; set; }
+    public string Type { get; set; } = string.Empty;
+}
+
+public sealed class PaymentMethodOwner
+{
+    [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
+    [JsonPropertyName("address")] public PaymentMethodOwnerAddressResponse? Address { get; set; }
+}
+
+public sealed class PaymentMethodOwnerAddressResponse
+{
+    [JsonPropertyName("city")] public string? City { get; set; }
+    [JsonPropertyName("country")] public string Country { get; set; } = string.Empty;
+    [JsonPropertyName("line_1")] public string? Line1 { get; set; }
+    [JsonPropertyName("line_2")] public string? Line2 { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("phone_number")] public string? PhoneNumber { get; set; }
+    [JsonPropertyName("post_code")] public string? PostCode { get; set; }
+    [JsonPropertyName("region")] public string? Region { get; set; }
+}
+
+public sealed class PaymentMethodSupplied
+{
+    [JsonPropertyName("attempt_id")] public string? AttemptId { get; set; }
+    [JsonPropertyName("by")] public string By { get; set; } = string.Empty;
+    [JsonPropertyName("channel")] public string? Channel { get; set; }
+    [JsonPropertyName("resource_id")] public string? ResourceId { get; set; }
+    [JsonPropertyName("resource_type")] public string? ResourceType { get; set; }
+    [JsonPropertyName("supplied_at")] public DateTimeOffset SuppliedAt { get; set; }
 }
 
 public sealed class PaymentMethodData
@@ -260,10 +248,16 @@ public sealed class PaymentMethodDeleteRequest
 public sealed class PaymentMethod
 {
     [JsonPropertyName("id")]
-    public string? Id { get; set; }
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("active")]
+    public bool Active { get; set; }
+
+    [JsonPropertyName("archived_at")]
+    public DateTimeOffset? ArchivedAt { get; set; }
 
     [JsonPropertyName("customer_id")]
-    public string? CustomerId { get; set; }
+    public string CustomerId { get; set; } = string.Empty;
 
     [JsonPropertyName("type")]
     public PaymentMethodType Type { get; set; }
@@ -277,6 +271,12 @@ public sealed class PaymentMethod
     [JsonPropertyName("card")]
     public PaymentMethodCard? Card { get; set; }
 
+    [JsonPropertyName("owner")]
+    public PaymentMethodOwner? Owner { get; set; }
+
+    [JsonPropertyName("supplied")]
+    public PaymentMethodSupplied? Supplied { get; set; }
+
     [JsonPropertyName("verification")]
     public PaymentMethodVerification? Verification { get; set; }
 
@@ -284,16 +284,16 @@ public sealed class PaymentMethod
     public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("expires_on")]
-    public string? ExpiresOn { get; set; }
+    public DateTimeOffset? ExpiresOn { get; set; }
+
+    [JsonPropertyName("ephemeral")]
+    public bool? Ephemeral { get; set; }
 
     [JsonPropertyName("created_at")]
-    public string? CreatedAt { get; set; }
-
-    [JsonPropertyName("verified")]
-    public bool? Verified { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
     [JsonPropertyName("verified_at")]
-    public string? VerifiedAt { get; set; }
+    public DateTimeOffset? VerifiedAt { get; set; }
 }
 
 public sealed class PaymentMethodTypeSetting
@@ -308,10 +308,10 @@ public sealed class PaymentMethodTypeSetting
     public string? Description { get; set; }
 
     [JsonPropertyName("enabled")]
-    public bool? Enabled { get; set; }
+    public bool Enabled { get; set; }
 
     [JsonPropertyName("confirms_use")]
-    public bool? ConfirmsUse { get; set; }
+    public bool ConfirmsUse { get; set; }
 }
 
 public sealed class PaymentMethodSettings
@@ -332,11 +332,11 @@ public sealed class PaymentMethodSettings
 public sealed class PaymentMethodPage
 {
     [JsonPropertyName("number")]
-    public int? Number { get; set; }
+    public int Number { get; set; }
 
     [JsonPropertyName("size")]
-    public int? Size { get; set; }
+    public int Size { get; set; }
 
     [JsonPropertyName("payment_methods")]
-    public List<PaymentMethod>? PaymentMethods { get; set; }
+    public List<PaymentMethod> PaymentMethods { get; set; } = [];
 }

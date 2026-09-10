@@ -70,7 +70,7 @@ public sealed class SchedulePayoutRequest
     public string? DestinationId { get; set; }
 
     [JsonPropertyName("execute_after")]
-    public string? ExecuteAfter { get; set; }
+    public DateTimeOffset? ExecuteAfter { get; set; }
 
     [JsonPropertyName("max_amount")]
     public long? MaxAmount { get; set; }
@@ -127,25 +127,25 @@ public sealed class Payout
     public PayoutError? LatestError { get; set; }
 
     [JsonPropertyName("initiated_at")]
-    public string? InitiatedAt { get; set; }
+    public DateTimeOffset? InitiatedAt { get; set; }
 
     [JsonPropertyName("execute_after")]
-    public string? ExecuteAfter { get; set; }
+    public DateTimeOffset? ExecuteAfter { get; set; }
 
     [JsonPropertyName("scheduled_at")]
-    public string? ScheduledAt { get; set; }
+    public DateTimeOffset? ScheduledAt { get; set; }
 
     [JsonPropertyName("canceled_at")]
-    public string? CanceledAt { get; set; }
+    public DateTimeOffset? CanceledAt { get; set; }
 
     [JsonPropertyName("executed_at")]
-    public string? ExecutedAt { get; set; }
+    public DateTimeOffset? ExecutedAt { get; set; }
 
     [JsonPropertyName("expected_at")]
-    public string? ExpectedAt { get; set; }
+    public DateTimeOffset? ExpectedAt { get; set; }
 
     [JsonPropertyName("succeeded_at")]
-    public string? SucceededAt { get; set; }
+    public DateTimeOffset? SucceededAt { get; set; }
 
     [JsonPropertyName("balance_transaction_ids")]
     public List<string>? BalanceTransactionIds { get; set; }
@@ -155,6 +155,6 @@ public sealed class PayoutError
 {
     [JsonPropertyName("cause")] public string? Cause { get; set; }
     [JsonPropertyName("message")] public string? Message { get; set; }
-    [JsonPropertyName("occurred_at")] public string? OccurredAt { get; set; }
+    [JsonPropertyName("occurred_at")] public DateTimeOffset? OccurredAt { get; set; }
     [JsonPropertyName("type")] public string? Type { get; set; }
 }

@@ -22,7 +22,7 @@ public sealed class PullPushConfig
     public bool? Enabled { get; set; }
 
     [JsonPropertyName("enabled_at")]
-    public string? EnabledAt { get; set; }
+    public DateTimeOffset? EnabledAt { get; set; }
 
     [JsonPropertyName("mandate")]
     public FinancialAccountMandate? Mandate { get; set; }
@@ -31,7 +31,7 @@ public sealed class PullPushConfig
 public sealed class FinancialAccountMandate
 {
     [JsonPropertyName("id")] public string? Id { get; set; }
-    [JsonPropertyName("created_at")] public string? CreatedAt { get; set; }
+    [JsonPropertyName("created_at")] public DateTimeOffset? CreatedAt { get; set; }
     [JsonPropertyName("user_agent")] public string? UserAgent { get; set; }
     [JsonPropertyName("ip_address")] public string? IpAddress { get; set; }
 }
@@ -45,8 +45,8 @@ public sealed class FinancialAccountVerificationRequest
 
 public sealed class FinancialAccountVerification
 {
-    [JsonPropertyName("initiated_at")] public string? InitiatedAt { get; set; }
-    [JsonPropertyName("completed_at")] public string? CompletedAt { get; set; }
+    [JsonPropertyName("initiated_at")] public DateTimeOffset? InitiatedAt { get; set; }
+    [JsonPropertyName("completed_at")] public DateTimeOffset? CompletedAt { get; set; }
     [JsonPropertyName("request")] public FinancialAccountVerificationRequest? Request { get; set; }
 }
 
@@ -109,13 +109,13 @@ public sealed class FinancialAccount
     public PullPushConfig? PullConfiguration { get; set; }
 
     [JsonPropertyName("archived_at")]
-    public string? ArchivedAt { get; set; }
+    public DateTimeOffset? ArchivedAt { get; set; }
 
     [JsonPropertyName("created_at")]
-    public string? CreatedAt { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
 
     [JsonPropertyName("disconnected_at")]
-    public string? DisconnectedAt { get; set; }
+    public DateTimeOffset? DisconnectedAt { get; set; }
 
     [JsonPropertyName("label")]
     public string? Label { get; set; }

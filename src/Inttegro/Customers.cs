@@ -111,7 +111,7 @@ public sealed class Customer
     public CustomData? CustomData { get; set; }
 
     [JsonPropertyName("created_at")]
-    public string? CreatedAt { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
 
     [JsonPropertyName("guest")]
     public bool Guest { get; set; }
@@ -120,7 +120,7 @@ public sealed class Customer
     public Address? ShippingAddress { get; set; }
 
     [JsonPropertyName("updated_at")]
-    public string? UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
 }
 
 [JsonConverter(typeof(CustomerBalanceJsonConverter))]
@@ -141,7 +141,7 @@ public sealed class CustomerBalance : IReadOnlyDictionary<string, CustomerBalanc
 public sealed class CustomerBalanceValue
 {
     [JsonPropertyName("as_of")]
-    public string? AsOf { get; set; }
+    public DateTimeOffset? AsOf { get; set; }
 
     [JsonPropertyName("available")]
     public Amount? Available { get; set; }
