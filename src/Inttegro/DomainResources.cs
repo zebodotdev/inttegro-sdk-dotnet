@@ -494,6 +494,29 @@ public sealed class PaymentMethodDeletion
     [JsonPropertyName("payment_method_id")] public string? PaymentMethodId { get; set; }
 }
 
+public sealed class CountryBankBranch
+{
+    [JsonPropertyName("id")] public string? Id { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("sort_code")] public string? SortCode { get; set; }
+}
+
+public sealed class CountryBank
+{
+    [JsonPropertyName("id")] public string? Id { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("swift_code")] public string? SwiftCode { get; set; }
+    [JsonPropertyName("sort_code_prefix")] public string? SortCodePrefix { get; set; }
+    [JsonPropertyName("branches")] public List<CountryBankBranch>? Branches { get; set; }
+}
+
+public sealed class CountryBankDirectory
+{
+    [JsonPropertyName("bank_account_type")] public string? BankAccountType { get; set; }
+    [JsonPropertyName("code_scheme")] public string? CodeScheme { get; set; }
+    [JsonPropertyName("items")] public List<CountryBank>? Items { get; set; }
+}
+
 public sealed class CountrySpecification
 {
     [JsonPropertyName("country_code")] public string? CountryCode { get; set; }
@@ -502,6 +525,10 @@ public sealed class CountrySpecification
     [JsonPropertyName("payment_methods")] public List<string>? PaymentMethods { get; set; }
     [JsonPropertyName("payout_schedules")] public List<string>? PayoutSchedules { get; set; }
     [JsonPropertyName("bt_aging_specs")] public List<string>? BalanceTransactionAgingSpecs { get; set; }
+    [JsonPropertyName("legal_entity_types")] public List<string>? LegalEntityTypes { get; set; }
+    [JsonPropertyName("financial_account_types")] public List<string>? FinancialAccountTypes { get; set; }
+    [JsonPropertyName("id_document_types")] public List<string>? IdDocumentTypes { get; set; }
+    [JsonPropertyName("banks")] public CountryBankDirectory? Banks { get; set; }
 }
 
 [JsonConverter(typeof(CountrySpecificationsJsonConverter))]

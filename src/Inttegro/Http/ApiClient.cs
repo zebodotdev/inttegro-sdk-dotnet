@@ -86,6 +86,19 @@ internal class ApiClient : IDisposable
             ?? throw new InvalidOperationException($"Inttegro returned an invalid {field} response for {path}");
     }
 
+    public async Task<InttegroResponse<T>> PostResourceWithResponseAsync<T>(
+        string path,
+        string field,
+        object? payload = null,
+        CancellationToken cancellationToken = default
+    ) where T : class
+    {
+        var response = await PostAsync(path, payload, cancellationToken);
+        var data = response[field]?.Deserialize<T>()
+            ?? throw new InvalidOperationException($"Inttegro returned an invalid {field} response for {path}");
+        return response.ToResponse(data);
+    }
+
     internal async Task<WireEnvelope> PostWithHeadersAsync(
         string path,
         object? payload = null,
@@ -339,8 +352,52 @@ internal class ApiClient : IDisposable
             throw error;
         }
         telemetryRequest.Decoded();
-        return new WireEnvelope(parsed);
+        return new WireEnvelope(
+            parsed,
+            (int)response.StatusCode,
+            ResponseHeaders(response),
+            ResponseMeta(parsed)
+        );
     }
+
+    private static IReadOnlyDictionary<string, string> ResponseHeaders(HttpResponseMessage response)
+    {
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var header in response.Headers)
+        {
+            headers[header.Key] = string.Join(",", header.Value);
+        }
+        foreach (var header in response.Content.Headers)
+        {
+            headers[header.Key] = string.Join(",", header.Value);
+        }
+        return headers;
+    }
+
+    private static IReadOnlyDictionary<string, object?>? ResponseMeta(JsonNode? parsed)
+    {
+        if (parsed is not JsonObject obj || obj["response_meta"] is not JsonObject meta)
+        {
+            return null;
+        }
+
+        var result = new Dictionary<string, object?>();
+        foreach (var item in meta)
+        {
+            result[item.Key] = NodeValue(item.Value);
+        }
+        return result;
+    }
+
+    private static object? NodeValue(JsonNode? node) =>
+        node switch
+        {
+            null => null,
+            JsonValue value => value.GetValue<object?>(),
+            JsonArray array => array.Select(NodeValue).ToList(),
+            JsonObject obj => obj.ToDictionary(item => item.Key, item => NodeValue(item.Value)),
+            _ => node.ToString()
+        };
 
     private async Task<FileDownload> SendForDownloadAsync(
         HttpRequestMessage request,

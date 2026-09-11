@@ -19,6 +19,31 @@ public class OrdersResource
         return PostOrderAsync("/orders/create", payload, cancellationToken);
     }
 
+    public Task<InttegroResponse<Order>> CreateWithResponseAsync(
+        object payload,
+        CancellationToken cancellationToken = default
+    ) =>
+        _client.PostResourceWithResponseAsync<Order>(
+            "/orders/create",
+            "order",
+            payload,
+            cancellationToken
+        );
+
+    public Task<InttegroResponse<Order>> CreateWithResponseAsync(
+        OrderCreateRequest payload,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ValidateCreate(payload);
+        return _client.PostResourceWithResponseAsync<Order>(
+            "/orders/create",
+            "order",
+            payload,
+            cancellationToken
+        );
+    }
+
     public Task<Order> UpdateAsync(object payload, CancellationToken cancellationToken = default) =>
         PostOrderAsync("/orders/update", payload, cancellationToken);
 

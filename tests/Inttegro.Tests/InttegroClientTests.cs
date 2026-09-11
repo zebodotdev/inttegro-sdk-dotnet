@@ -554,6 +554,34 @@ public class InttegroClientTests
     }
 
     [Fact]
+    public async Task ResponseEnvelopeExposesResponseOnlyMetadata()
+    {
+        var handler = new RecordingHandler
+        {
+            RequestId = "req_123",
+            RetryAfter = "15",
+            ResponseBody = """
+                {"order":{"id":"or_123"},"response_meta":{"request_id":"req_123","debug":{"provider_attempts":1}}}
+                """
+        };
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.inttegro.com") };
+        using var client = new InttegroClient("test", httpClient: httpClient);
+
+        var response = await client.Orders.CreateWithResponseAsync(new OrderCreateRequest
+        {
+            CustomerId = "cu_123",
+            LineItems = [new LineItemParams { Type = LineItemType.Product }]
+        });
+
+        Assert.Equal("or_123", response.Data.Id);
+        Assert.Equal(200, response.StatusCode);
+        Assert.Equal("req_123", response.RequestId);
+        Assert.Equal("15", response.RetryAfter);
+        Assert.Equal("req_123", response.Headers["x-request-id"]);
+        Assert.Equal("req_123", response.Meta!["request_id"]);
+    }
+
+    [Fact]
     public async Task TelemetryRecordsSafeHttpFailure()
     {
         var activities = new List<Activity>();
@@ -661,6 +689,7 @@ public class InttegroClientTests
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
         public string? ResponseBody { get; set; }
         public string? RequestId { get; set; }
+        public string? RetryAfter { get; set; }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -675,6 +704,10 @@ public class InttegroClientTests
             if (!string.IsNullOrWhiteSpace(RequestId))
             {
                 response.Headers.TryAddWithoutValidation("x-request-id", RequestId);
+            }
+            if (!string.IsNullOrWhiteSpace(RetryAfter))
+            {
+                response.Headers.TryAddWithoutValidation("Retry-After", RetryAfter);
             }
             return response;
         }
