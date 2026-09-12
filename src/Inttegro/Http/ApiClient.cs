@@ -86,6 +86,19 @@ internal class ApiClient : IDisposable
             ?? throw new InvalidOperationException($"Inttegro returned an invalid {field} response for {path}");
     }
 
+    public async Task<InttegroResponse<T>> PostResourceWithResponseAsync<T>(
+        string path,
+        string field,
+        object? payload = null,
+        CancellationToken cancellationToken = default
+    ) where T : class
+    {
+        var response = await PostAsync(path, payload, cancellationToken);
+        var data = response[field]?.Deserialize<T>()
+            ?? throw new InvalidOperationException($"Inttegro returned an invalid {field} response for {path}");
+        return response.ToResponse(data);
+    }
+
     internal async Task<WireEnvelope> PostWithHeadersAsync(
         string path,
         object? payload = null,
@@ -339,8 +352,90 @@ internal class ApiClient : IDisposable
             throw error;
         }
         telemetryRequest.Decoded();
-        return new WireEnvelope(parsed);
+        return new WireEnvelope(
+            parsed,
+            (int)response.StatusCode,
+            ResponseHeaders(response),
+            ResponseMeta(parsed)
+        );
     }
+
+    private static IReadOnlyDictionary<string, string> ResponseHeaders(HttpResponseMessage response)
+    {
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var header in response.Headers)
+        {
+            headers[header.Key] = string.Join(",", header.Value);
+        }
+        foreach (var header in response.Content.Headers)
+        {
+            headers[header.Key] = string.Join(",", header.Value);
+        }
+        return headers;
+    }
+
+    private static IReadOnlyDictionary<string, object?>? ResponseMeta(JsonNode? parsed)
+    {
+        if (parsed is not JsonObject obj || obj["response_meta"] is not JsonObject meta)
+        {
+            return null;
+        }
+
+        var result = new Dictionary<string, object?>();
+        foreach (var item in meta)
+        {
+            result[item.Key] = NodeValue(item.Value);
+        }
+        return result;
+    }
+
+    private static object? NodeValue(JsonNode? node) =>
+        node switch
+        {
+            null => null,
+            System.Text.Json.Nodes.JsonValue value => ScalarValue(value),
+            JsonArray array => array.Select(NodeValue).ToList(),
+            JsonObject obj => obj.ToDictionary(item => item.Key, item => NodeValue(item.Value)),
+            _ => node.ToJsonString()
+        };
+
+    private static object? ScalarValue(System.Text.Json.Nodes.JsonValue value)
+    {
+        if (value.TryGetValue<JsonElement>(out var element))
+        {
+            return ElementValue(element);
+        }
+        if (value.TryGetValue<string>(out var stringValue))
+        {
+            return stringValue;
+        }
+        if (value.TryGetValue<bool>(out var boolValue))
+        {
+            return boolValue;
+        }
+        if (value.TryGetValue<long>(out var longValue))
+        {
+            return longValue;
+        }
+        if (value.TryGetValue<double>(out var doubleValue))
+        {
+            return doubleValue;
+        }
+        return value.ToJsonString();
+    }
+
+    private static object? ElementValue(JsonElement element) =>
+        element.ValueKind switch
+        {
+            JsonValueKind.String => element.GetString(),
+            JsonValueKind.Number => element.TryGetInt64(out var longValue) ? longValue : element.GetDouble(),
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            JsonValueKind.Null => null,
+            JsonValueKind.Array => element.EnumerateArray().Select(ElementValue).ToList(),
+            JsonValueKind.Object => element.EnumerateObject().ToDictionary(item => item.Name, item => ElementValue(item.Value)),
+            _ => element.ToString()
+        };
 
     private async Task<FileDownload> SendForDownloadAsync(
         HttpRequestMessage request,
