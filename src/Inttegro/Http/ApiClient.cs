@@ -393,7 +393,7 @@ internal class ApiClient : IDisposable
         node switch
         {
             null => null,
-            JsonValue value => value.GetValue<object?>(),
+            System.Text.Json.Nodes.JsonValue value => value.GetValue<object?>(),
             JsonArray array => array.Select(NodeValue).ToList(),
             JsonObject obj => obj.ToDictionary(item => item.Key, item => NodeValue(item.Value)),
             _ => node.ToString()
