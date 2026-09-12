@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [7.1.0] - 2026-09-12
+
+- Added opt-in response envelopes that expose status, headers, request IDs,
+  retry hints, and response metadata without changing existing resource return
+  values.
+- Added fluent domain helpers for common resource state and actionability checks.
+
 ## [7.0.0] - 2026-09-10
 
 - Breaking: replaced generic dictionaries with named models for balances, purchase intents, products, payment methods, payments, and orders.
