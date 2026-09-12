@@ -8,7 +8,7 @@
     <Authors>Inttegro Engineering</Authors>
     <Company>Inttegro</Company>
     <Description>Official .NET SDK for the Inttegro API</Description>
-    <RepositoryUrl>https://github.com/zebodotdev/inttegro-sdk-dotnet</RepositoryUrl>
+    <RepositoryUrl>https://github.com/inttegro/inttegro-sdk-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://dotnet.inttegro.dev/</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
