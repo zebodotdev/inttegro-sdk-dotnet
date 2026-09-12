@@ -393,10 +393,48 @@ internal class ApiClient : IDisposable
         node switch
         {
             null => null,
-            System.Text.Json.Nodes.JsonValue value => value.GetValue<object?>(),
+            System.Text.Json.Nodes.JsonValue value => ScalarValue(value),
             JsonArray array => array.Select(NodeValue).ToList(),
             JsonObject obj => obj.ToDictionary(item => item.Key, item => NodeValue(item.Value)),
-            _ => node.ToString()
+            _ => node.ToJsonString()
+        };
+
+    private static object? ScalarValue(System.Text.Json.Nodes.JsonValue value)
+    {
+        if (value.TryGetValue<JsonElement>(out var element))
+        {
+            return ElementValue(element);
+        }
+        if (value.TryGetValue<string>(out var stringValue))
+        {
+            return stringValue;
+        }
+        if (value.TryGetValue<bool>(out var boolValue))
+        {
+            return boolValue;
+        }
+        if (value.TryGetValue<long>(out var longValue))
+        {
+            return longValue;
+        }
+        if (value.TryGetValue<double>(out var doubleValue))
+        {
+            return doubleValue;
+        }
+        return value.ToJsonString();
+    }
+
+    private static object? ElementValue(JsonElement element) =>
+        element.ValueKind switch
+        {
+            JsonValueKind.String => element.GetString(),
+            JsonValueKind.Number => element.TryGetInt64(out var longValue) ? longValue : element.GetDouble(),
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            JsonValueKind.Null => null,
+            JsonValueKind.Array => element.EnumerateArray().Select(ElementValue).ToList(),
+            JsonValueKind.Object => element.EnumerateObject().ToDictionary(item => item.Name, item => ElementValue(item.Value)),
+            _ => element.ToString()
         };
 
     private async Task<FileDownload> SendForDownloadAsync(
